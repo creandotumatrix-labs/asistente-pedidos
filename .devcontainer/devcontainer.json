@@ -1,0 +1,18 @@
+{
+  "name": "asistente-pedidos",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "asistente-pedidos (webhook + board)", "onAutoForward": "notify" }
+  },
+  "postCreateCommand": "npm install",
+  "postAttachCommand": "node -v && echo 'Next: npm run validate && npm test && npm run simulate'",
+  "remoteEnv": {
+    "MODEL": "claude-sonnet-4-6",
+    "BUSINESS": "taqueria-el-pastor",
+    "CHANNEL": "twilio"
+  },
+  "customizations": {
+    "vscode": { "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"] }
+  }
+}
