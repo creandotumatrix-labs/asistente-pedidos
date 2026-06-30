@@ -9,7 +9,6 @@ import type {
   ToolResult,
   KitchenTicket,
 } from "../types.ts";
-import { loadMenu } from "../config.ts";
 
 // ── helpers ────────────────────────────────────────────────────────
 function norm(s: string): string {
@@ -87,7 +86,8 @@ const get_menu: ToolDef = {
     },
   },
   handler: (input, ctx): ToolResult => {
-    const menu = loadMenu(ctx.config);
+    const menu = ctx.menu;
+    if (!menu) return { ok: false, error: "catalogo_no_disponible" };
     let items = menu.items.filter((i) => i.disponible);
     if (typeof input.categoria === "string") {
       const c = norm(input.categoria);
@@ -139,7 +139,7 @@ const add_to_order: ToolDef = {
     required: ["items"],
   },
   handler: (input, ctx): ToolResult => {
-    const menu = loadMenu(ctx.config).items;
+    const menu = ctx.menu?.items ?? [];
     const reqItems = Array.isArray(input.items) ? (input.items as Array<Record<string, unknown>>) : [];
     const order = ctx.session.order;
     const agregados: unknown[] = [];

@@ -1,7 +1,6 @@
 // Real-estate tool pack — the white-label flip. Same ToolDef contract,
 // same runtime, same WhatsApp number. Only the config + this pack differ.
 import type { Listing, ToolContext, ToolDef, ToolResult } from "../types.ts";
-import { loadListings } from "../config.ts";
 
 function norm(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -25,7 +24,7 @@ const get_listings: ToolDef = {
     },
   },
   handler: (input, ctx): ToolResult => {
-    let items = loadListings(ctx.config).filter((l) => l.disponible);
+    let items = (ctx.listings ?? []).filter((l) => l.disponible);
     if (typeof input.operacion === "string") {
       items = items.filter((l) => l.operacion === input.operacion);
     }
@@ -72,7 +71,7 @@ const schedule_viewing: ToolDef = {
     required: ["listing_id", "datetime", "name", "tel"],
   },
   handler: (input, ctx): ToolResult => {
-    const listing = loadListings(ctx.config).find((l) => norm(l.id) === norm(String(input.listing_id ?? "")));
+    const listing = (ctx.listings ?? []).find((l) => norm(l.id) === norm(String(input.listing_id ?? "")));
     if (!listing) return { ok: false, error: "propiedad_no_encontrada" };
     const viewing = {
       id: `V-${100 + ctx.session.reservations.length + 1}`,
