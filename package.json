@@ -1,0 +1,29 @@
+{
+  "name": "asistente-pedidos",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "White-label WhatsApp ordering + reservation agent on a shared Claude runtime. Flip one config line, same engine, new business.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "simulate": "tsx scripts/simulate.ts",
+    "demo": "node --experimental-strip-types scripts/simulate.ts --script",
+    "preflight": "node --experimental-strip-types scripts/preflight-live.ts",
+    "test": "node --experimental-strip-types scripts/test.ts && node --experimental-strip-types scripts/check-channels.ts",
+    "validate": "node --experimental-strip-types scripts/validate.ts",
+    "ci": "npm run validate && npm test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": ">=0.30.0",
+    "express": ">=4.19.0"
+  },
+  "devDependencies": {
+    "@types/express": ">=4.17.0",
+    "@types/node": ">=20.0.0",
+    "tsx": ">=4.7.0",
+    "typescript": ">=5.4.0"
+  }
+}
