@@ -106,13 +106,16 @@
   const grid = $("grid");
   let soundOn = false, audio = null;
   let tickets = 0, items = 0, sales = 0, currency = "MXN";
+  const QBIZ = new URLSearchParams(location.search).get("business"); // optional: scope this board to one business
+  let FILTER_BIZ = null; // business_name to filter on, set once /config resolves (only when ?business= present)
 
   const fmt = (n) => "$" + Number(n||0).toLocaleString("es-MX");
   const timeStr = (ms) => new Date(ms||Date.now()).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
   const svcLabel = {pickup:"Para llevar", delivery:"Entrega", dine_in:"En sitio"};
 
   // ── branding from the active config ──
-  fetch("/config").then(r=>r.json()).then(c=>{
+  fetch("/config" + (QBIZ ? "?business=" + encodeURIComponent(QBIZ) : "")).then(r=>r.json()).then(c=>{
+    if(QBIZ) FILTER_BIZ = c.business_name || null;
     if(c.branding && c.branding.color) document.documentElement.style.setProperty("--accent", c.branding.color);
     const emoji = (c.branding && c.branding.emoji) || "🍽️";
     $("logo").textContent = emoji; $("emptyicon").textContent = emoji;
@@ -218,6 +221,7 @@
     es.onmessage = (ev) => {
       let e; try{ e=JSON.parse(ev.data);}catch{return;}
       if(!e||!e.type) return;
+      if(FILTER_BIZ && e.payload && e.payload.business && e.payload.business !== FILTER_BIZ) return; // board scoped to one business
       if(e.type==="ticket") ticketCard(e.payload);
       else eventCard(e.type, e.payload||{});
     };
