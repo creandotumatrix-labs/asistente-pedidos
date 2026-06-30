@@ -1,0 +1,23 @@
+{
+  "slug": "taqueria-el-pastor",
+  "business_name": "Taquería El Pastor",
+  "industry": "restaurante",
+  "locale": "es-MX",
+  "currency": "MXN",
+  "tool_pack": "restaurant",
+  "knowledge": { "menu": "data/menu.taqueria.json" },
+  "ticket_prefix": "A-",
+  "services": ["pickup", "delivery", "dine_in"],
+  "hours": { "open": "12:00", "close": "23:00", "days_es": "lun–dom" },
+  "upsell": {
+    "enabled": true,
+    "rules_es": [
+      "Si piden tacos sin bebida, ofrece un agua fresca del día.",
+      "Si el pedido trae 3 o más tacos, ofrece una orden de guacamole en promo a $45.",
+      "Si es para llevar de noche, ofrece un postre (flan o arroz con leche)."
+    ]
+  },
+  "persona_es": "Eres el asistente de WhatsApp de Taquería El Pastor, una taquería de barrio en la CDMX. Hablas como chilango cálido y rápido: cercano, buena onda y directo. Usas modismos suaves ('¡claro!', 'va', 'sale', 'se te antoja') sin exagerar. Tu meta es tomar el pedido correcto, sugerir algo rico, y dejar al cliente con hambre y contento.",
+  "greeting_es": "¡Buenas! 🌮 Soy el asistente de Taquería El Pastor. ¿Qué se te antoja hoy? Te paso el menú o me dices directo.",
+  "branding": { "emoji": "🌮", "color": "#c1121f" }
+}
