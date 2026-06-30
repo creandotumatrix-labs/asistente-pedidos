@@ -1,0 +1,266 @@
+{
+  "moneda": "MXN",
+  "categorias": ["Tacos", "Especialidades", "Quesadillas y Volcanes", "Tortas", "Guarniciones", "Bebidas", "Postres"],
+  "items": [
+    {
+      "id": "taco_pastor",
+      "nombre_es": "Taco de pastor",
+      "categoria": "Tacos",
+      "precio_mxn": 30,
+      "descripcion_es": "Cerdo adobado al trompo con piña.",
+      "modificadores": [
+        { "id": "con_todo", "nombre_es": "con todo (cebolla, cilantro, piña)" },
+        { "id": "sin_cebolla", "nombre_es": "sin cebolla" },
+        { "id": "sin_cilantro", "nombre_es": "sin cilantro" },
+        { "id": "extra_carne", "nombre_es": "extra carne", "precio_mxn": 15 },
+        { "id": "con_queso", "nombre_es": "con queso", "precio_mxn": 12 }
+      ],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "taco_suadero",
+      "nombre_es": "Taco de suadero",
+      "categoria": "Tacos",
+      "precio_mxn": 30,
+      "descripcion_es": "Res suave dorada en comal.",
+      "modificadores": [
+        { "id": "con_todo", "nombre_es": "con todo (cebolla, cilantro)" },
+        { "id": "sin_cebolla", "nombre_es": "sin cebolla" },
+        { "id": "sin_cilantro", "nombre_es": "sin cilantro" },
+        { "id": "extra_carne", "nombre_es": "extra carne", "precio_mxn": 15 },
+        { "id": "con_queso", "nombre_es": "con queso", "precio_mxn": 12 }
+      ],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "taco_bistec",
+      "nombre_es": "Taco de bistec",
+      "categoria": "Tacos",
+      "precio_mxn": 34,
+      "descripcion_es": "Bistec de res a la plancha.",
+      "modificadores": [
+        { "id": "con_todo", "nombre_es": "con todo (cebolla, cilantro)" },
+        { "id": "sin_cebolla", "nombre_es": "sin cebolla" },
+        { "id": "extra_carne", "nombre_es": "extra carne", "precio_mxn": 15 },
+        { "id": "con_queso", "nombre_es": "con queso", "precio_mxn": 12 }
+      ],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "taco_campechano",
+      "nombre_es": "Taco campechano",
+      "categoria": "Tacos",
+      "precio_mxn": 34,
+      "descripcion_es": "Bistec con longaniza y chicharrón.",
+      "modificadores": [
+        { "id": "con_todo", "nombre_es": "con todo" },
+        { "id": "sin_cebolla", "nombre_es": "sin cebolla" },
+        { "id": "con_queso", "nombre_es": "con queso", "precio_mxn": 12 }
+      ],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "taco_longaniza",
+      "nombre_es": "Taco de longaniza",
+      "categoria": "Tacos",
+      "precio_mxn": 28,
+      "descripcion_es": "Longaniza roja estilo CDMX.",
+      "modificadores": [
+        { "id": "con_todo", "nombre_es": "con todo" },
+        { "id": "sin_cebolla", "nombre_es": "sin cebolla" }
+      ],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "gringa_pastor",
+      "nombre_es": "Gringa de pastor",
+      "categoria": "Tacos",
+      "precio_mxn": 65,
+      "descripcion_es": "Tortilla de harina con pastor y queso gratinado.",
+      "modificadores": [
+        { "id": "con_todo", "nombre_es": "con todo" },
+        { "id": "sin_cebolla", "nombre_es": "sin cebolla" }
+      ],
+      "alergenos": ["gluten", "lacteos"],
+      "disponible": true
+    },
+    {
+      "id": "quesabirria",
+      "nombre_es": "Quesabirria (orden de 3)",
+      "categoria": "Especialidades",
+      "precio_mxn": 130,
+      "descripcion_es": "Tacos de birria de res con queso y consomé.",
+      "modificadores": [{ "id": "sin_cebolla", "nombre_es": "sin cebolla" }],
+      "alergenos": ["lacteos"],
+      "disponible": false
+    },
+    {
+      "id": "alambre_res",
+      "nombre_es": "Alambre de res",
+      "categoria": "Especialidades",
+      "precio_mxn": 145,
+      "descripcion_es": "Res con tocino, pimiento, cebolla y queso. Con tortillas.",
+      "modificadores": [
+        { "id": "sin_pimiento", "nombre_es": "sin pimiento" },
+        { "id": "extra_queso", "nombre_es": "extra queso", "precio_mxn": 18 }
+      ],
+      "alergenos": ["lacteos"],
+      "disponible": true
+    },
+    {
+      "id": "volcan_pastor",
+      "nombre_es": "Volcán de pastor",
+      "categoria": "Quesadillas y Volcanes",
+      "precio_mxn": 45,
+      "descripcion_es": "Tostada de queso fundido con pastor.",
+      "modificadores": [{ "id": "con_todo", "nombre_es": "con todo" }],
+      "alergenos": ["lacteos"],
+      "disponible": true
+    },
+    {
+      "id": "quesadilla",
+      "nombre_es": "Quesadilla de queso",
+      "categoria": "Quesadillas y Volcanes",
+      "precio_mxn": 45,
+      "descripcion_es": "Tortilla con queso Oaxaca. Elige guiso.",
+      "modificadores": [
+        { "id": "pastor", "nombre_es": "con pastor", "precio_mxn": 15 },
+        { "id": "champinon", "nombre_es": "con champiñón", "precio_mxn": 10 }
+      ],
+      "alergenos": ["lacteos", "gluten"],
+      "disponible": true
+    },
+    {
+      "id": "torta_pastor",
+      "nombre_es": "Torta de pastor",
+      "categoria": "Tortas",
+      "precio_mxn": 75,
+      "descripcion_es": "Telera con pastor, frijol, aguacate y queso.",
+      "modificadores": [
+        { "id": "sin_chile", "nombre_es": "sin chile" },
+        { "id": "extra_carne", "nombre_es": "extra carne", "precio_mxn": 20 }
+      ],
+      "alergenos": ["gluten", "lacteos"],
+      "disponible": true
+    },
+    {
+      "id": "torta_milanesa",
+      "nombre_es": "Torta de milanesa",
+      "categoria": "Tortas",
+      "precio_mxn": 85,
+      "descripcion_es": "Milanesa de res empanizada, aguacate y quesillo.",
+      "modificadores": [{ "id": "sin_chile", "nombre_es": "sin chile" }],
+      "alergenos": ["gluten", "lacteos", "huevo"],
+      "disponible": true
+    },
+    {
+      "id": "guacamole",
+      "nombre_es": "Guacamole con totopos",
+      "categoria": "Guarniciones",
+      "precio_mxn": 55,
+      "descripcion_es": "Guacamole fresco con totopos de la casa.",
+      "modificadores": [],
+      "alergenos": [],
+      "promo": { "precio_mxn": 45, "etiqueta_es": "Promo del día a $45" },
+      "disponible": true
+    },
+    {
+      "id": "frijoles_charros",
+      "nombre_es": "Frijoles charros",
+      "categoria": "Guarniciones",
+      "precio_mxn": 40,
+      "descripcion_es": "Frijoles con tocino, chorizo y chile.",
+      "modificadores": [],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "queso_fundido",
+      "nombre_es": "Queso fundido",
+      "categoria": "Guarniciones",
+      "precio_mxn": 90,
+      "descripcion_es": "Queso fundido con tortillas. Agrega pastor o chorizo.",
+      "modificadores": [
+        { "id": "pastor", "nombre_es": "con pastor", "precio_mxn": 20 },
+        { "id": "chorizo", "nombre_es": "con chorizo", "precio_mxn": 18 }
+      ],
+      "alergenos": ["lacteos"],
+      "disponible": true
+    },
+    {
+      "id": "agua_horchata",
+      "nombre_es": "Agua de horchata",
+      "categoria": "Bebidas",
+      "precio_mxn": 35,
+      "descripcion_es": "Agua fresca de horchata (1/2 L).",
+      "modificadores": [],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "agua_jamaica",
+      "nombre_es": "Agua de jamaica",
+      "categoria": "Bebidas",
+      "precio_mxn": 35,
+      "descripcion_es": "Agua fresca de jamaica (1/2 L).",
+      "modificadores": [],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "agua_tamarindo",
+      "nombre_es": "Agua de tamarindo",
+      "categoria": "Bebidas",
+      "precio_mxn": 35,
+      "descripcion_es": "Agua fresca de tamarindo (1/2 L).",
+      "modificadores": [],
+      "alergenos": [],
+      "disponible": false
+    },
+    {
+      "id": "refresco",
+      "nombre_es": "Refresco",
+      "categoria": "Bebidas",
+      "precio_mxn": 30,
+      "descripcion_es": "Coca-Cola, Sidral, Fanta o agua mineral.",
+      "modificadores": [],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "michelada",
+      "nombre_es": "Michelada",
+      "categoria": "Bebidas",
+      "precio_mxn": 75,
+      "descripcion_es": "Cerveza preparada con limón, salsas y chamoy.",
+      "modificadores": [{ "id": "sin_chamoy", "nombre_es": "sin chamoy" }],
+      "alergenos": ["gluten"],
+      "disponible": true
+    },
+    {
+      "id": "flan",
+      "nombre_es": "Flan napolitano",
+      "categoria": "Postres",
+      "precio_mxn": 45,
+      "descripcion_es": "Flan casero de la abuela.",
+      "modificadores": [],
+      "alergenos": ["lacteos", "huevo"],
+      "disponible": true
+    },
+    {
+      "id": "arroz_con_leche",
+      "nombre_es": "Arroz con leche",
+      "categoria": "Postres",
+      "precio_mxn": 40,
+      "descripcion_es": "Arroz con leche y canela.",
+      "modificadores": [],
+      "alergenos": ["lacteos"],
+      "disponible": true
+    }
+  ]
+}
