@@ -1,0 +1,98 @@
+[
+  {
+    "id": "RN-01",
+    "titulo_es": "Departamento en La Condesa, remodelado",
+    "operacion": "renta",
+    "zona": "Condesa",
+    "recamaras": 2,
+    "banos": 2,
+    "m2": 95,
+    "precio_mxn": 38000,
+    "amenidades": ["balcón", "pet friendly", "1 cajón", "amueblado"],
+    "disponible": true
+  },
+  {
+    "id": "RN-02",
+    "titulo_es": "Loft en Roma Norte",
+    "operacion": "renta",
+    "zona": "Roma Norte",
+    "recamaras": 1,
+    "banos": 1,
+    "m2": 58,
+    "precio_mxn": 24000,
+    "amenidades": ["roof garden", "seguridad 24h"],
+    "disponible": true
+  },
+  {
+    "id": "RN-03",
+    "titulo_es": "Departamento de lujo en Polanco",
+    "operacion": "renta",
+    "zona": "Polanco",
+    "recamaras": 2,
+    "banos": 2,
+    "m2": 120,
+    "precio_mxn": 55000,
+    "amenidades": ["gimnasio", "2 cajones", "concierge", "amueblado"],
+    "disponible": true
+  },
+  {
+    "id": "RN-04",
+    "titulo_es": "Casa en Del Valle con jardín",
+    "operacion": "renta",
+    "zona": "Del Valle",
+    "recamaras": 3,
+    "banos": 3,
+    "m2": 210,
+    "precio_mxn": 42000,
+    "amenidades": ["jardín", "3 cajones", "cuarto de servicio"],
+    "disponible": false
+  },
+  {
+    "id": "VN-01",
+    "titulo_es": "Penthouse en Polanco con terraza",
+    "operacion": "venta",
+    "zona": "Polanco",
+    "recamaras": 3,
+    "banos": 3,
+    "m2": 240,
+    "precio_mxn": 18500000,
+    "amenidades": ["terraza", "3 cajones", "bodega", "vista a Reforma"],
+    "disponible": true
+  },
+  {
+    "id": "VN-02",
+    "titulo_es": "Departamento en Coyoacán cerca del centro",
+    "operacion": "venta",
+    "zona": "Coyoacán",
+    "recamaras": 2,
+    "banos": 2,
+    "m2": 88,
+    "precio_mxn": 6200000,
+    "amenidades": ["1 cajón", "elevador", "área común"],
+    "disponible": true
+  },
+  {
+    "id": "VN-03",
+    "titulo_es": "Casa en Santa Fe en condominio",
+    "operacion": "venta",
+    "zona": "Santa Fe",
+    "recamaras": 4,
+    "banos": 4,
+    "m2": 320,
+    "precio_mxn": 14900000,
+    "amenidades": ["alberca", "vigilancia", "4 cajones", "family room"],
+    "disponible": true
+  },
+  {
+    "id": "VN-04",
+    "titulo_es": "Departamento en Roma Sur, obra nueva",
+    "operacion": "venta",
+    "zona": "Roma Sur",
+    "recamaras": 2,
+    "banos": 2,
+    "m2": 102,
+    "precio_mxn": 7800000,
+    "amenidades": ["roof garden", "preventa", "2 cajones"],
+    "disponible": true
+  }
+]
