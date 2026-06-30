@@ -60,9 +60,11 @@ async function handleInbound(inbound: TwilioInbound | MetaInbound): Promise<stri
     if (event === "ticket") void saveTicket(payload);
     else void saveEvent(event, payload);
   };
+  const snapshot = session.messages.length; // roll back a partial turn on error so the session stays valid
   try {
     return await runAgent(session, text, emit);
   } catch (e) {
+    session.messages.length = snapshot;
     console.error("[agent] error:", e);
     return ["Uy, tuve un problemita técnico 🙈. ¿Me lo repites en un momento?"];
   }

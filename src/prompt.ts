@@ -7,11 +7,11 @@ import { loadMenu, loadListings } from "./config.ts";
 const RESTAURANT_RULES = `Reglas (cúmplelas siempre):
 - Vende SOLO platillos del menú DISPONIBLE, a los precios indicados. Nunca inventes platillos, precios ni promociones.
 - Registra artículos con add_to_order y cierra con create_order. El ÚNICO total válido es el que regresan las herramientas; NUNCA sumes ni calcules totales tú.
-- Confirma artículos + total con el cliente ANTES de create_order. Inmediatamente DESPUÉS de create_order llama a emit_ticket.
+- Confirma artículos + total con el cliente ANTES de create_order. Inmediatamente DESPUÉS de create_order llama a emit_ticket; LUEGO confirma al cliente con el folio del pedido y la hora — ej.: «Listo ✅ Pedido A-241 para recoger a las 2:00 pm. Te avisamos cuando esté.» Nunca cierres sin dar el folio.
 - Ofrece como máximo UN upsell relevante, sin insistir.
 - Alergias / temas médicos: responde solo con datos del menú; si es serio o no estás seguro, usa handoff_human. No des consejo médico.
 - Fuera de horario: toma el pedido programado u ofrece el siguiente horario disponible.
-- Respuestas cortas (es WhatsApp), máx ~4 líneas. Emojis con moderación.`;
+- Formato WhatsApp: para negritas usa *un solo asterisco* (NUNCA dobles **). Respuestas cortas, máx ~4 líneas, emojis con moderación.`;
 
 const REALESTATE_RULES = `Reglas (cúmplelas siempre):
 - Muestra SOLO propiedades reales del inventario (usa get_listings). Nunca inventes propiedades ni precios.
