@@ -36,6 +36,24 @@ export async function saveTicket(t: Record<string, unknown>): Promise<void> {
   }
 }
 
+/** Read-back for verification/observability: live counts + recent rows from Postgres. */
+export async function stats(): Promise<Record<string, unknown>> {
+  if (!pool) return { db: false, note: "DATABASE_URL no configurada (modo memoria)" };
+  const [tc, ec, rt, re] = await Promise.all([
+    pool.query("SELECT count(*)::int AS n FROM tickets"),
+    pool.query("SELECT count(*)::int AS n FROM events"),
+    pool.query("SELECT ticket_id, business, total, currency, created_at FROM tickets ORDER BY created_at DESC LIMIT 5"),
+    pool.query("SELECT type, business, created_at FROM events ORDER BY created_at DESC LIMIT 5"),
+  ]);
+  return {
+    db: true,
+    tickets_total: tc.rows[0].n,
+    events_total: ec.rows[0].n,
+    recent_tickets: rt.rows,
+    recent_events: re.rows,
+  };
+}
+
 /** Persist a business event (reservation/viewing/lead/handoff/etc.). */
 export async function saveEvent(type: string, payload: Record<string, unknown>): Promise<void> {
   if (!pool) return;

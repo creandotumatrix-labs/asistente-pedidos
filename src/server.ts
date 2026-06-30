@@ -17,7 +17,7 @@ import {
   type Inbound as TwilioInbound,
 } from "./channels/twilio.ts";
 import { parseMetaInbound, verifyMetaChallenge, sendMeta, type Inbound as MetaInbound } from "./channels/meta.ts";
-import { migrate, saveTicket, saveEvent, dbEnabled } from "./db.ts";
+import { migrate, saveTicket, saveEvent, dbEnabled, stats } from "./db.ts";
 
 // Native .env loading (Node >=20.6) — no dotenv dependency.
 try {
@@ -173,6 +173,15 @@ app.get("/config", (req: Request, res: Response) => {
 
 app.get("/kitchen", (_req: Request, res: Response) => {
   res.type("html").send(readFileSync(join(projectRoot(), "web", "kitchen.html"), "utf8"));
+});
+
+// Read-back of what's actually persisted in Postgres (proves real, durable data).
+app.get("/api/stats", async (_req: Request, res: Response) => {
+  try {
+    res.json(await stats());
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+  }
 });
 
 app.get("/healthz", (_req: Request, res: Response) =>
