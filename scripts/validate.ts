@@ -2,7 +2,7 @@
 //   node --experimental-strip-types scripts/validate.ts   (or: npm run validate)
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { loadConfig, loadMenu, loadListings, projectRoot } from "../src/config.ts";
+import { loadConfig, readMenuFixture, readListingsFixture, projectRoot } from "../src/config.ts";
 import { newSession } from "../src/session.ts";
 import { restaurantTools } from "../src/tools/restaurant.ts";
 import type { BusinessConfig, ToolContext } from "../src/types.ts";
@@ -45,7 +45,7 @@ for (const file of configFiles) {
       bad(`${slug}: menú no encontrado (${cfg.knowledge.menu})`);
       continue;
     }
-    const menu = loadMenu(cfg);
+    const menu = readMenuFixture(cfg);
     const bad_prices = menu.items.filter((i) => !(i.precio_mxn > 0));
     const off = menu.items.filter((i) => !i.disponible).length;
     if (bad_prices.length) bad(`${slug}: ${bad_prices.length} item(s) con precio inválido`);
@@ -55,7 +55,7 @@ for (const file of configFiles) {
       bad(`${slug}: inventario no encontrado (${cfg.knowledge.listings})`);
       continue;
     }
-    const listings = loadListings(cfg);
+    const listings = readListingsFixture(cfg);
     const bad_prices = listings.filter((l) => !(l.precio_mxn > 0));
     if (bad_prices.length) bad(`${slug}: ${bad_prices.length} propiedad(es) con precio inválido`);
     else ok(`${slug} · realestate · ${listings.length} propiedades · "${cfg.business_name}"`);
@@ -69,7 +69,7 @@ console.log("\nMatemática del PRD (3 pastor + horchata + guac promo):");
 try {
   const cfg = loadConfig("taqueria-el-pastor");
   const session = newSession("whatsapp:+520000000000", "taqueria-el-pastor");
-  const ctx: ToolContext = { session, config: cfg, emit: () => {}, now: () => new Date() };
+  const ctx: ToolContext = { session, config: cfg, emit: () => {}, now: () => new Date(), menu: readMenuFixture(cfg) };
   const add = restaurantTools.find((t) => t.name === "add_to_order")!;
   add.handler({ items: [{ item: "taco_pastor", qty: 3, mods: ["con todo"] }, { item: "agua_horchata", qty: 1 }, { item: "guacamole", qty: 1 }] }, ctx);
   if (session.order.total === 170) ok(`total = $170 ✓`);

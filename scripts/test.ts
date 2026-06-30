@@ -4,7 +4,7 @@
 import { strict as assert } from "node:assert";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadConfig } from "../src/config.ts";
+import { loadConfig, readMenuFixture, readListingsFixture } from "../src/config.ts";
 import { newSession } from "../src/session.ts";
 import { restaurantTools } from "../src/tools/restaurant.ts";
 import { realEstateTools } from "../src/tools/realestate.ts";
@@ -38,6 +38,8 @@ function harness(slug: string): Harness {
     config,
     emit: (type, payload) => events.push({ type, payload }),
     now: () => new Date("2026-06-29T20:00:00.000Z"),
+    menu: config.tool_pack === "restaurant" ? readMenuFixture(config) : undefined,
+    listings: config.tool_pack === "realestate" ? readListingsFixture(config) : undefined,
   };
   const call = (pack: ToolDef[], name: string, input: Record<string, unknown>): ToolResult => {
     const t = pack.find((x) => x.name === name);
