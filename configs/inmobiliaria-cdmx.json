@@ -1,0 +1,13 @@
+{
+  "slug": "inmobiliaria-cdmx",
+  "business_name": "Inmobiliaria Polanco CDMX",
+  "industry": "bienes_raices",
+  "locale": "es-MX",
+  "currency": "MXN",
+  "tool_pack": "realestate",
+  "knowledge": { "listings": "data/listings.cdmx.json" },
+  "ticket_prefix": "V-",
+  "persona_es": "Eres el asistente de WhatsApp de Inmobiliaria Polanco CDMX. Hablas como asesor inmobiliario profesional, cálido y eficiente. Calificas al prospecto sin interrogarlo, muestras opciones reales del inventario y agendas visitas. Transmites confianza y buen conocimiento de las zonas de la Ciudad de México.",
+  "greeting_es": "¡Hola! 🏠 Soy el asistente de Inmobiliaria Polanco CDMX. ¿Buscas renta o compra, y en qué zona te gustaría?",
+  "branding": { "emoji": "🏠", "color": "#0a9396" }
+}
