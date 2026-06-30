@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cocina · Live</title>
+<style>
+  :root{
+    --accent:#c1121f; --bg:#0c0f14; --panel:#161b22; --panel2:#1d242e;
+    --ink:#eef2f6; --muted:#8a97a6; --line:#2a3340;
+    --pickup:#f5a524; --delivery:#3b82f6; --dine_in:#22c55e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%, rgba(255,255,255,.05), transparent), var(--bg);
+    color:var(--ink); font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    display:flex; align-items:center; gap:18px; padding:16px 22px;
+    background:linear-gradient(180deg, rgba(255,255,255,.04), transparent), var(--panel);
+    border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5;
+  }
+  .brand{display:flex; align-items:center; gap:12px; min-width:0}
+  .logo{font-size:30px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  .brand h1{font-size:19px; margin:0; font-weight:700; letter-spacing:.2px; white-space:nowrap}
+  .brand .sub{font-size:12px; color:var(--muted); margin-top:1px}
+  .pill{display:inline-flex; align-items:center; gap:7px; padding:5px 11px; border-radius:999px;
+    background:var(--panel2); border:1px solid var(--line); font-size:12px; color:var(--muted)}
+  .dot{width:8px;height:8px;border-radius:50%;background:#41506310}
+  .dot.live{background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,.6); animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  .spacer{flex:1}
+  .stats{display:flex; gap:10px}
+  .stat{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:8px 14px; text-align:center; min-width:74px}
+  .stat b{display:block; font-size:20px; line-height:1; color:#fff}
+  .stat span{font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
+  button.btn{background:var(--panel2); color:var(--ink); border:1px solid var(--line); border-radius:10px;
+    padding:9px 13px; font-size:13px; cursor:pointer}
+  button.btn:hover{border-color:var(--accent)}
+  #grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:16px; padding:20px 22px 60px}
+  .empty{grid-column:1/-1; text-align:center; color:var(--muted); padding:14vh 0}
+  .empty .big{font-size:64px; opacity:.5}
+  .card{background:var(--panel); border:1px solid var(--line); border-left:5px solid var(--accent);
+    border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.35); animation:in .35s ease both}
+  @keyframes in{from{opacity:0; transform:translateY(-10px) scale(.98)}to{opacity:1; transform:none}}
+  .card.flash{animation:in .35s ease both, glow 5.5s ease}
+  @keyframes glow{0%,18%{box-shadow:0 0 0 2px var(--accent), 0 10px 30px rgba(0,0,0,.4)}100%{box-shadow:0 10px 30px rgba(0,0,0,.35)}}
+  .card.done{opacity:.45; filter:saturate(.5)}
+  .chead{display:flex; align-items:center; gap:10px; padding:13px 15px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(255,255,255,.03), transparent)}
+  .tid{font-weight:800; font-size:18px; letter-spacing:.3px}
+  .badge{font-size:10.5px; font-weight:800; letter-spacing:.7px; padding:4px 9px; border-radius:7px; text-transform:uppercase}
+  .b-pickup{background:rgba(245,165,36,.16); color:var(--pickup); border:1px solid rgba(245,165,36,.4)}
+  .b-delivery{background:rgba(59,130,246,.16); color:var(--delivery); border:1px solid rgba(59,130,246,.4)}
+  .b-dine_in{background:rgba(34,197,94,.16); color:var(--dine_in); border:1px solid rgba(34,197,94,.4)}
+  .b-event{background:rgba(138,151,166,.16); color:#cbd5e1; border:1px solid var(--line)}
+  .when{margin-left:auto; font-size:12px; color:var(--muted)}
+  .cbody{padding:13px 15px}
+  .line{display:flex; gap:10px; padding:7px 0; border-bottom:1px dashed rgba(255,255,255,.06)}
+  .line:last-child{border-bottom:0}
+  .qty{font-weight:800; color:#fff; background:var(--panel2); border:1px solid var(--line); border-radius:7px;
+    min-width:30px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px}
+  .iname{font-weight:600}
+  .mods{color:var(--muted); font-size:12.5px; margin-top:2px}
+  .lt{margin-left:auto; color:var(--muted); font-variant-numeric:tabular-nums; font-size:13px}
+  .cfoot{display:flex; align-items:center; gap:12px; padding:12px 15px; border-top:1px solid var(--line); background:var(--panel2)}
+  .total{font-size:22px; font-weight:800; color:#fff; font-variant-numeric:tabular-nums}
+  .total small{font-size:12px; color:var(--muted); font-weight:600}
+  .cust{font-size:12px; color:var(--muted); line-height:1.3}
+  .bump{margin-left:auto; background:var(--accent); color:#fff; border:0; border-radius:9px; padding:9px 14px;
+    font-weight:700; font-size:13px; cursor:pointer}
+  .bump:hover{filter:brightness(1.1)}
+  .kv{font-size:13.5px; line-height:1.6}
+  .kv b{color:#fff}
+  .note{margin-top:8px; font-size:12.5px; color:#fcd34d}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo" id="logo">🍽️</div>
+      <div>
+        <h1 id="bizname">Cocina · Live</h1>
+        <div class="sub" id="bizsub">conectando…</div>
+      </div>
+    </div>
+    <span class="pill"><span class="dot" id="dot"></span><span id="connlabel">offline</span></span>
+    <div class="spacer"></div>
+    <div class="stats">
+      <div class="stat"><b id="s-tickets">0</b><span>tickets</span></div>
+      <div class="stat"><b id="s-items">0</b><span>artículos</span></div>
+      <div class="stat"><b id="s-sales">$0</b><span>ventas</span></div>
+    </div>
+    <button class="btn" id="sound">🔔 Sonido</button>
+  </header>
+
+  <main id="grid">
+    <div class="empty" id="empty"><div class="big" id="emptyicon">🍽️</div><div>Esperando pedidos…</div></div>
+  </main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const grid = $("grid");
+  let soundOn = false, audio = null;
+  let tickets = 0, items = 0, sales = 0, currency = "MXN";
+
+  const fmt = (n) => "$" + Number(n||0).toLocaleString("es-MX");
+  const timeStr = (ms) => new Date(ms||Date.now()).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
+  const svcLabel = {pickup:"Para llevar", delivery:"Entrega", dine_in:"En sitio"};
+
+  // ── branding from the active config ──
+  fetch("/config").then(r=>r.json()).then(c=>{
+    if(c.branding && c.branding.color) document.documentElement.style.setProperty("--accent", c.branding.color);
+    const emoji = (c.branding && c.branding.emoji) || "🍽️";
+    $("logo").textContent = emoji; $("emptyicon").textContent = emoji;
+    $("bizname").textContent = c.business_name || "Cocina · Live";
+    $("bizsub").textContent = (c.industry||"") + " · canal " + (c.channel||"") + " · " + (c.tool_pack||"");
+    document.title = "Cocina · " + (c.business_name||"Live");
+    currency = c.currency || "MXN";
+  }).catch(()=>{});
+
+  // ── sound ──
+  $("sound").onclick = () => {
+    soundOn = !soundOn;
+    $("sound").textContent = soundOn ? "🔔 Sonido ON" : "🔕 Sonido";
+    if (soundOn && !audio) audio = new (window.AudioContext||window.webkitAudioContext)();
+    if (soundOn && audio && audio.state === "suspended") audio.resume();
+  };
+  function ding(kind){
+    if(!soundOn || !audio) return;
+    const o=audio.createOscillator(), g=audio.createGain();
+    o.connect(g); g.connect(audio.destination);
+    o.type="sine"; o.frequency.value = kind==="ticket"?880:660;
+    g.gain.setValueAtTime(0.0001, audio.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.25, audio.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime+0.32);
+    o.start(); o.stop(audio.currentTime+0.34);
+    if(kind==="ticket"){ const o2=audio.createOscillator(); o2.connect(g); o2.type="sine";
+      o2.frequency.setValueAtTime(1320, audio.currentTime+0.12); o2.start(audio.currentTime+0.12); o2.stop(audio.currentTime+0.34); }
+  }
+
+  function clearEmpty(){ const e=$("empty"); if(e) e.remove(); }
+
+  function prepend(el){ clearEmpty(); grid.insertBefore(el, grid.firstChild); }
+
+  function ticketCard(t){
+    tickets++; sales += Number(t.total||0);
+    (t.items||[]).forEach(i=> items += Number(i.qty||0));
+    $("s-tickets").textContent = tickets;
+    $("s-items").textContent = items;
+    $("s-sales").textContent = fmt(sales);
+
+    const svc = (t.service && t.service.type) || "pickup";
+    const card = document.createElement("div");
+    card.className = "card flash";
+    card.innerHTML = `
+      <div class="chead">
+        <span class="tid">${t.ticket_id||"—"}</span>
+        <span class="badge b-${svc}">${svcLabel[svc]||svc}${t.service&&t.service.time?" · "+t.service.time:""}</span>
+        <span class="when">${timeStr(Date.now())}</span>
+      </div>
+      <div class="cbody">
+        ${(t.items||[]).map(i=>`
+          <div class="line">
+            <div class="qty">${i.qty}×</div>
+            <div>
+              <div class="iname">${esc(i.name)}</div>
+              ${(i.mods&&i.mods.length)?`<div class="mods">${i.mods.map(esc).join(" · ")}</div>`:""}
+            </div>
+            <div class="lt">${fmt(i.line_total)}</div>
+          </div>`).join("")}
+        ${t.service&&t.service.address?`<div class="note">📍 ${esc(t.service.address)}</div>`:""}
+        ${t.notes?`<div class="note">📝 ${esc(t.notes)}</div>`:""}
+      </div>
+      <div class="cfoot">
+        <div class="total">${fmt(t.total)} <small>${t.currency||currency}</small></div>
+        <div class="cust">${t.customer&&t.customer.name?esc(t.customer.name)+"<br>":""}${t.customer&&t.customer.phone?esc(t.customer.phone):""}</div>
+        <button class="bump">Listo ✓</button>
+      </div>`;
+    card.querySelector(".bump").onclick = () => card.classList.toggle("done");
+    prepend(card);
+    ding("ticket");
+  }
+
+  function eventCard(kind, p){
+    const icons = {reservation:"📅", viewing:"🏠", lead:"⭐", handoff:"🙋", session_reset:"♻️"};
+    const titles = {reservation:"Reservación", viewing:"Visita agendada", lead:"Prospecto", handoff:"Pasar a humano", session_reset:"Sesión reiniciada"};
+    let rows = "";
+    if(kind==="reservation") rows = kv("Mesa", `${p.size} personas`)+kv("Cuándo",p.datetime)+kv("Nombre",p.name)+kv("Tel",p.tel)+kv("Folio",p.id);
+    else if(kind==="viewing") rows = kv("Propiedad",p.titulo_es||p.listing_id)+kv("Zona",p.zona)+kv("Cuándo",p.datetime)+kv("Nombre",p.name)+kv("Tel",p.tel)+kv("Folio",p.id);
+    else if(kind==="lead") rows = kv("Nombre",p.name)+kv("Operación",p.operacion)+kv("Presupuesto",p.presupuesto_max?fmt(p.presupuesto_max):"—")+kv("Zona",p.zona||"—")+kv("Calidad",(p.tier||"").toUpperCase());
+    else if(kind==="handoff") rows = kv("Motivo",p.reason)+kv("Resumen",p.summary);
+    else rows = kv("Sesión", p.session||"");
+    const card = document.createElement("div");
+    card.className = "card flash";
+    card.style.borderLeftColor = "#8a97a6";
+    card.innerHTML = `
+      <div class="chead">
+        <span class="tid">${icons[kind]||"🔔"} ${p.id||""}</span>
+        <span class="badge b-event">${titles[kind]||kind}</span>
+        <span class="when">${timeStr(Date.now())}</span>
+      </div>
+      <div class="cbody"><div class="kv">${rows}</div></div>`;
+    prepend(card);
+    ding("event");
+  }
+  const kv = (k,v)=> v!==undefined&&v!==null&&v!==""?`<div><b>${k}:</b> ${esc(String(v))}</div>`:"";
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+  // ── SSE ──
+  function connect(){
+    const es = new EventSource("/events");
+    es.onopen = () => { $("dot").className="dot live"; $("connlabel").textContent="en vivo"; };
+    es.onerror = () => { $("dot").className="dot"; $("connlabel").textContent="reconectando…"; };
+    es.onmessage = (ev) => {
+      let e; try{ e=JSON.parse(ev.data);}catch{return;}
+      if(!e||!e.type) return;
+      if(e.type==="ticket") ticketCard(e.payload);
+      else eventCard(e.type, e.payload||{});
+    };
+  }
+  connect();
+})();
+</script>
+</body>
+</html>
