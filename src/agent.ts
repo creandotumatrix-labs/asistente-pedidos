@@ -1,8 +1,8 @@
 // Shared Claude tool-use runtime. The ONLY module that imports the Anthropic
 // SDK. Identical loop for every business; the config decides persona + tools.
 import Anthropic from "@anthropic-ai/sdk";
-import type { Session, ToolContext } from "./types.ts";
-import { loadConfig } from "./config.ts";
+import type { Session, ToolContext, Menu, Listing } from "./types.ts";
+import { loadConfig, loadMenu, loadListings } from "./config.ts";
 import { buildSystemPrompt } from "./prompt.ts";
 import { getToolPack, findTool, toAnthropicTools } from "./tools/index.ts";
 
@@ -29,8 +29,16 @@ export async function runAgent(session: Session, userText: string, emit: Emit): 
   const config = loadConfig(session.businessSlug);
   const pack = getToolPack(config.tool_pack);
   const tools = toAnthropicTools(pack);
-  const system = buildSystemPrompt(config);
-  const ctx: ToolContext = { session, config, emit, now: () => new Date() };
+
+  // LIVE catalog from Postgres (no JSON at runtime): fetched once per turn and
+  // injected into the system prompt + every tool handler via ctx.
+  let menu: Menu | undefined;
+  let listings: Listing[] | undefined;
+  if (config.tool_pack === "restaurant") menu = await loadMenu(config);
+  else listings = await loadListings(config);
+
+  const system = buildSystemPrompt(config, { menu, listings });
+  const ctx: ToolContext = { session, config, emit, now: () => new Date(), menu, listings };
 
   session.messages.push({ role: "user", content: userText });
   const out: string[] = [];

@@ -110,6 +110,10 @@ export interface ToolContext {
   config: BusinessConfig;
   emit: (event: string, payload: Record<string, unknown>) => void;
   now: () => Date;
+  // LIVE catalog for this turn, fetched from Postgres by the agent runtime and
+  // injected here so tool handlers stay synchronous + deterministic.
+  menu?: Menu;
+  listings?: Listing[];
 }
 export interface ToolResult {
   ok: boolean;

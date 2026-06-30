@@ -1,8 +1,7 @@
 // System-prompt builder. The persona + rules + knowledge are assembled from
-// the active config — this is what makes one engine serve many businesses.
-// Built-in imports only (loads knowledge from disk), so it stays SDK-free.
-import type { BusinessConfig, MenuItem } from "./types.ts";
-import { loadMenu, loadListings } from "./config.ts";
+// the active config + the LIVE catalog passed in by the agent runtime (fetched
+// from Postgres). Built-in imports only — no SDK, no DB, no file reads here.
+import type { BusinessConfig, MenuItem, Menu, Listing } from "./types.ts";
 
 const RESTAURANT_RULES = `Reglas (cúmplelas siempre):
 - Vende SOLO platillos del menú DISPONIBLE, a los precios indicados. Nunca inventes platillos, precios ni promociones.
@@ -38,8 +37,8 @@ function groupMenu(items: MenuItem[]): string {
   return lines.join("\n");
 }
 
-function listingsSummary(config: BusinessConfig): string {
-  const items = loadListings(config).filter((l) => l.disponible);
+function listingsSummary(all: Listing[]): string {
+  const items = all.filter((l) => l.disponible);
   const zonas = [...new Set(items.map((l) => l.zona))];
   const renta = items.filter((l) => l.operacion === "renta");
   const venta = items.filter((l) => l.operacion === "venta");
@@ -53,7 +52,10 @@ function listingsSummary(config: BusinessConfig): string {
   ].join("\n");
 }
 
-export function buildSystemPrompt(config: BusinessConfig): string {
+export function buildSystemPrompt(
+  config: BusinessConfig,
+  catalog: { menu?: Menu; listings?: Listing[] } = {},
+): string {
   const parts: string[] = [];
   parts.push(config.persona_es.trim());
   parts.push(
@@ -61,7 +63,7 @@ export function buildSystemPrompt(config: BusinessConfig): string {
   );
 
   if (config.tool_pack === "restaurant") {
-    parts.push("MENÚ DISPONIBLE (precios en MXN, IVA incluido):\n" + groupMenu(loadMenu(config).items));
+    parts.push("MENÚ DISPONIBLE (precios en MXN, IVA incluido):\n" + groupMenu(catalog.menu?.items ?? []));
     if (config.services?.length) {
       const map: Record<string, string> = { pickup: "para llevar", delivery: "entrega", dine_in: "en sitio" };
       parts.push(`Servicios: ${config.services.map((s) => map[s] ?? s).join(", ")}.`);
@@ -72,7 +74,7 @@ export function buildSystemPrompt(config: BusinessConfig): string {
     }
     parts.push(RESTAURANT_RULES);
   } else {
-    parts.push(listingsSummary(config));
+    parts.push(listingsSummary(catalog.listings ?? []));
     parts.push(REALESTATE_RULES);
   }
 

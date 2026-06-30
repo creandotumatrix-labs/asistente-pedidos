@@ -7,7 +7,7 @@ import { join } from "node:path";
 import express from "express";
 import type { Request, Response } from "express";
 import { bus, emitFeed, type FeedEvent } from "./bus.ts";
-import { loadConfig, projectRoot } from "./config.ts";
+import { loadConfig, loadMenu, loadListings, projectRoot } from "./config.ts";
 import { SessionStore } from "./session.ts";
 import { runAgent } from "./agent.ts";
 import {
@@ -179,6 +179,26 @@ app.get("/kitchen", (_req: Request, res: Response) => {
 app.get("/api/stats", async (_req: Request, res: Response) => {
   try {
     res.json(await stats());
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+  }
+});
+
+// LIVE catalog endpoints — real Postgres reads (exactly what the agent sees).
+app.get("/api/menu", async (req: Request, res: Response) => {
+  try {
+    const cfg = loadConfig(resolveBiz(typeof req.query.business === "string" ? req.query.business : undefined));
+    if (cfg.tool_pack !== "restaurant") return res.status(400).json({ ok: false, error: "negocio_sin_menu" });
+    res.json({ ok: true, business: cfg.slug, ...(await loadMenu(cfg)) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+  }
+});
+app.get("/api/listings", async (req: Request, res: Response) => {
+  try {
+    const cfg = loadConfig(resolveBiz(typeof req.query.business === "string" ? req.query.business : undefined));
+    if (cfg.tool_pack !== "realestate") return res.status(400).json({ ok: false, error: "negocio_sin_inventario" });
+    res.json({ ok: true, business: cfg.slug, listings: await loadListings(cfg) });
   } catch (e) {
     res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
   }
