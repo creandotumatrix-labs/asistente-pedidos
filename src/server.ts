@@ -41,6 +41,15 @@ bus.on("feed", (e: FeedEvent) => {
   if (backlog.length > 30) backlog.shift();
 });
 
+// Deterministic order confirmation, appended after a ticket emits so the customer
+// ALWAYS gets a clean folio + total regardless of how the model phrases its reply.
+function ticketConfirmation(t: Record<string, any>): string {
+  const svc: Record<string, string> = { pickup: "para recoger", delivery: "entrega a domicilio", dine_in: "en sitio" };
+  const when = t?.service?.time ? ` a las ${t.service.time}` : "";
+  const name = t?.customer?.name ? `, ${t.customer.name}` : "";
+  return `Listo ✅ Pedido *${t.ticket_id}* — ${svc[t?.service?.type] ?? "tu pedido"}${when}. Total: *$${t.total} ${t.currency}*. ¡Gracias${name}! 🌮 Te avisamos cuando esté.`;
+}
+
 // ── shared inbound handler for every channel ──────────────────────────────
 async function handleInbound(inbound: TwilioInbound | MetaInbound): Promise<string[]> {
   const id = `whatsapp:${inbound.from}`;
@@ -55,14 +64,21 @@ async function handleInbound(inbound: TwilioInbound | MetaInbound): Promise<stri
   const session = store.get(id, BUSINESS, inbound.profileName);
   if (!text) return [config.greeting_es ?? "¡Hola!"];
 
+  let ticket: Record<string, unknown> | null = null;
   const emit = (event: string, payload: Record<string, unknown>) => {
     emitFeed(event, payload);
-    if (event === "ticket") void saveTicket(payload);
-    else void saveEvent(event, payload);
+    if (event === "ticket") {
+      ticket = payload;
+      void saveTicket(payload);
+    } else {
+      void saveEvent(event, payload);
+    }
   };
   const snapshot = session.messages.length; // roll back a partial turn on error so the session stays valid
   try {
-    return await runAgent(session, text, emit);
+    const replies = await runAgent(session, text, emit);
+    if (ticket) replies.push(ticketConfirmation(ticket));
+    return replies;
   } catch (e) {
     session.messages.length = snapshot;
     console.error("[agent] error:", e);
