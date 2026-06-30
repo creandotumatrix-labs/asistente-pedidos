@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cocina · Live</title>
+<title>Live Ops</title>
 <style>
   :root{
     --accent:#c1121f; --bg:#0c0f14; --panel:#161b22; --panel2:#1d242e;
@@ -28,7 +28,7 @@
   .brand .sub{font-size:12px; color:var(--muted); margin-top:1px}
   .pill{display:inline-flex; align-items:center; gap:7px; padding:5px 11px; border-radius:999px;
     background:var(--panel2); border:1px solid var(--line); font-size:12px; color:var(--muted)}
-  .dot{width:8px;height:8px;border-radius:50%;background:#41506310}
+  .dot{width:8px;height:8px;border-radius:50%;background:#415063}
   .dot.live{background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,.6); animation:pulse 1.8s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
   .spacer{flex:1}
@@ -39,6 +39,10 @@
   button.btn{background:var(--panel2); color:var(--ink); border:1px solid var(--line); border-radius:10px;
     padding:9px 13px; font-size:13px; cursor:pointer}
   button.btn:hover{border-color:var(--accent)}
+  /* language segmented toggle */
+  .lang{display:inline-flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--panel2)}
+  .lang button{background:transparent; color:var(--muted); border:0; padding:9px 12px; font-size:13px; font-weight:700; cursor:pointer; letter-spacing:.4px}
+  .lang button.on{background:var(--accent); color:#fff}
   #grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:16px; padding:20px 22px 60px}
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); padding:14vh 0}
   .empty .big{font-size:64px; opacity:.5}
@@ -82,53 +86,104 @@
     <div class="brand">
       <div class="logo" id="logo">🍽️</div>
       <div>
-        <h1 id="bizname">Cocina · Live</h1>
-        <div class="sub" id="bizsub">conectando…</div>
+        <h1 id="bizname">Live Ops</h1>
+        <div class="sub" id="bizsub"></div>
       </div>
     </div>
-    <span class="pill"><span class="dot" id="dot"></span><span id="connlabel">offline</span></span>
+    <span class="pill"><span class="dot" id="dot"></span><span id="connlabel"></span></span>
     <div class="spacer"></div>
     <div class="stats">
-      <div class="stat"><b id="s-tickets">0</b><span>tickets</span></div>
-      <div class="stat"><b id="s-items">0</b><span>artículos</span></div>
-      <div class="stat"><b id="s-sales">$0</b><span>ventas</span></div>
+      <div class="stat"><b id="s-tickets">0</b><span id="l-tickets"></span></div>
+      <div class="stat"><b id="s-items">0</b><span id="l-items"></span></div>
+      <div class="stat"><b id="s-sales">$0</b><span id="l-sales"></span></div>
     </div>
-    <button class="btn" id="sound">🔔 Sonido</button>
+    <div class="lang" id="lang">
+      <button data-lang="es">ES</button><button data-lang="en">EN</button>
+    </div>
+    <button class="btn" id="sound"></button>
   </header>
 
-  <main id="grid">
-    <div class="empty" id="empty"><div class="big" id="emptyicon">🍽️</div><div>Esperando pedidos…</div></div>
-  </main>
+  <main id="grid"></main>
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
   const grid = $("grid");
-  let soundOn = false, audio = null;
-  let tickets = 0, items = 0, sales = 0, currency = "MXN";
-  const QBIZ = new URLSearchParams(location.search).get("business"); // optional: scope this board to one business
-  let FILTER_BIZ = null; // business_name to filter on, set once /config resolves (only when ?business= present)
 
-  const fmt = (n) => "$" + Number(n||0).toLocaleString("es-MX");
-  const timeStr = (ms) => new Date(ms||Date.now()).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
-  const svcLabel = {pickup:"Para llevar", delivery:"Entrega", dine_in:"En sitio"};
+  // ── i18n ──
+  const I18N = {
+    es: {
+      connecting:"conectando…", live:"en vivo", reconnecting:"reconectando…", offline:"sin conexión",
+      tickets:"tickets", items:"artículos", sales:"ventas",
+      sound_on:"🔔 Sonido ON", sound_off:"🔕 Sonido", empty:"Esperando pedidos…",
+      bump:"Listo ✓", channel:"canal",
+      svc_pickup:"Para llevar", svc_delivery:"Entrega", svc_dine_in:"En sitio",
+      t_reservation:"Reservación", t_viewing:"Visita agendada", t_lead:"Prospecto",
+      t_handoff:"Pasar a humano", t_session_reset:"Sesión reiniciada",
+      k_table:"Mesa", k_people:"personas", k_when:"Cuándo", k_name:"Nombre", k_tel:"Tel", k_folio:"Folio",
+      k_property:"Propiedad", k_zone:"Zona", k_operation:"Operación", k_budget:"Presupuesto",
+      k_quality:"Calidad", k_reason:"Motivo", k_summary:"Resumen", k_session:"Sesión"
+    },
+    en: {
+      connecting:"connecting…", live:"live", reconnecting:"reconnecting…", offline:"offline",
+      tickets:"tickets", items:"items", sales:"sales",
+      sound_on:"🔔 Sound ON", sound_off:"🔕 Sound", empty:"Waiting for orders…",
+      bump:"Done ✓", channel:"channel",
+      svc_pickup:"Takeout", svc_delivery:"Delivery", svc_dine_in:"Dine-in",
+      t_reservation:"Reservation", t_viewing:"Viewing booked", t_lead:"Lead",
+      t_handoff:"Hand to human", t_session_reset:"Session reset",
+      k_table:"Table", k_people:"people", k_when:"When", k_name:"Name", k_tel:"Phone", k_folio:"Ref",
+      k_property:"Property", k_zone:"Zone", k_operation:"Operation", k_budget:"Budget",
+      k_quality:"Quality", k_reason:"Reason", k_summary:"Summary", k_session:"Session"
+    }
+  };
+  let LANG = (localStorage.getItem("ui_lang") === "en") ? "en" : "es";
+  const t = (k) => (I18N[LANG][k] ?? k);
+
+  // ── state ──
+  let soundOn = false, audio = null, connState = "connecting";
+  let tickets = 0, items = 0, sales = 0, currency = "MXN", cfg = {};
+  const EVENTS = []; // newest first; lets us re-render on language switch
+
+  const fmt = (n) => "$" + Number(n||0).toLocaleString(LANG==="en"?"en-US":"es-MX");
+  const timeStr = (ms) => new Date(ms||Date.now()).toLocaleTimeString(LANG==="en"?"en-US":"es-MX",{hour:"2-digit",minute:"2-digit"});
+  const esc = (s)=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const kv = (k,v)=> v!==undefined&&v!==null&&v!==""?`<div><b>${k}:</b> ${esc(String(v))}</div>`:"";
+
+  // ── static chrome (re-applied on language switch) ──
+  function applyStatic(){
+    $("connlabel").textContent = t(connState);
+    $("l-tickets").textContent = t("tickets");
+    $("l-items").textContent = t("items");
+    $("l-sales").textContent = t("sales");
+    $("sound").textContent = soundOn ? t("sound_on") : t("sound_off");
+    $("bizsub").textContent = (cfg.industry||"") + " · " + t("channel") + " " + (cfg.channel||"") + " · " + (cfg.tool_pack||"");
+    [...$("lang").children].forEach(b => b.classList.toggle("on", b.dataset.lang === LANG));
+    document.documentElement.lang = LANG === "en" ? "en" : "es-MX";
+  }
+
+  function setConn(state){ connState = state; $("dot").className = "dot" + (state==="live"?" live":""); $("connlabel").textContent = t(state); }
 
   // ── branding from the active config ──
+  const QBIZ = new URLSearchParams(location.search).get("business");
+  let FILTER_BIZ = null;
   fetch("/config" + (QBIZ ? "?business=" + encodeURIComponent(QBIZ) : "")).then(r=>r.json()).then(c=>{
+    cfg = c || {};
     if(QBIZ) FILTER_BIZ = c.business_name || null;
     if(c.branding && c.branding.color) document.documentElement.style.setProperty("--accent", c.branding.color);
     const emoji = (c.branding && c.branding.emoji) || "🍽️";
-    $("logo").textContent = emoji; $("emptyicon").textContent = emoji;
-    $("bizname").textContent = c.business_name || "Cocina · Live";
-    $("bizsub").textContent = (c.industry||"") + " · canal " + (c.channel||"") + " · " + (c.tool_pack||"");
-    document.title = "Cocina · " + (c.business_name||"Live");
+    $("logo").textContent = emoji;
+    $("bizname").textContent = c.business_name || "Live Ops";
+    document.title = (c.business_name || "Live Ops") + " · Live";
     currency = c.currency || "MXN";
-  }).catch(()=>{});
+    applyStatic();
+    renderAll();
+  }).catch(()=>{ applyStatic(); renderAll(); });
 
   // ── sound ──
   $("sound").onclick = () => {
     soundOn = !soundOn;
-    $("sound").textContent = soundOn ? "🔔 Sonido ON" : "🔕 Sonido";
+    $("sound").textContent = soundOn ? t("sound_on") : t("sound_off");
     if (soundOn && !audio) audio = new (window.AudioContext||window.webkitAudioContext)();
     if (soundOn && audio && audio.state === "suspended") audio.resume();
   };
@@ -145,87 +200,109 @@
       o2.frequency.setValueAtTime(1320, audio.currentTime+0.12); o2.start(audio.currentTime+0.12); o2.stop(audio.currentTime+0.34); }
   }
 
-  function clearEmpty(){ const e=$("empty"); if(e) e.remove(); }
+  // ── language toggle ──
+  $("lang").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button"); if(!b) return;
+    const next = b.dataset.lang;
+    if(next === LANG) return;
+    LANG = next; localStorage.setItem("ui_lang", LANG);
+    applyStatic();
+    $("s-sales").textContent = fmt(sales); // re-locale the number formatting
+    renderAll();
+  });
 
-  function prepend(el){ clearEmpty(); grid.insertBefore(el, grid.firstChild); }
-
-  function ticketCard(t){
-    tickets++; sales += Number(t.total||0);
-    (t.items||[]).forEach(i=> items += Number(i.qty||0));
-    $("s-tickets").textContent = tickets;
-    $("s-items").textContent = items;
-    $("s-sales").textContent = fmt(sales);
-
-    const svc = (t.service && t.service.type) || "pickup";
+  // ── card builders (read current LANG via t()) ──
+  function ticketNode(t0, flash){
+    const svc = (t0.service && t0.service.type) || "pickup";
     const card = document.createElement("div");
-    card.className = "card flash";
+    card.className = "card" + (flash ? " flash" : "");
     card.innerHTML = `
       <div class="chead">
-        <span class="tid">${t.ticket_id||"—"}</span>
-        <span class="badge b-${svc}">${svcLabel[svc]||svc}${t.service&&t.service.time?" · "+t.service.time:""}</span>
+        <span class="tid">${esc(t0.ticket_id||"—")}</span>
+        <span class="badge b-${svc}">${t("svc_"+svc)}${t0.service&&t0.service.time?" · "+esc(t0.service.time):""}</span>
         <span class="when">${timeStr(Date.now())}</span>
       </div>
       <div class="cbody">
-        ${(t.items||[]).map(i=>`
+        ${(t0.items||[]).map(i=>`
           <div class="line">
             <div class="qty">${i.qty}×</div>
-            <div>
-              <div class="iname">${esc(i.name)}</div>
-              ${(i.mods&&i.mods.length)?`<div class="mods">${i.mods.map(esc).join(" · ")}</div>`:""}
-            </div>
+            <div><div class="iname">${esc(i.name)}</div>${(i.mods&&i.mods.length)?`<div class="mods">${i.mods.map(esc).join(" · ")}</div>`:""}</div>
             <div class="lt">${fmt(i.line_total)}</div>
           </div>`).join("")}
-        ${t.service&&t.service.address?`<div class="note">📍 ${esc(t.service.address)}</div>`:""}
-        ${t.notes?`<div class="note">📝 ${esc(t.notes)}</div>`:""}
+        ${t0.service&&t0.service.address?`<div class="note">📍 ${esc(t0.service.address)}</div>`:""}
+        ${t0.notes?`<div class="note">📝 ${esc(t0.notes)}</div>`:""}
       </div>
       <div class="cfoot">
-        <div class="total">${fmt(t.total)} <small>${t.currency||currency}</small></div>
-        <div class="cust">${t.customer&&t.customer.name?esc(t.customer.name)+"<br>":""}${t.customer&&t.customer.phone?esc(t.customer.phone):""}</div>
-        <button class="bump">Listo ✓</button>
+        <div class="total">${fmt(t0.total)} <small>${esc(t0.currency||currency)}</small></div>
+        <div class="cust">${t0.customer&&t0.customer.name?esc(t0.customer.name)+"<br>":""}${t0.customer&&t0.customer.phone?esc(t0.customer.phone):""}</div>
+        <button class="bump">${t("bump")}</button>
       </div>`;
     card.querySelector(".bump").onclick = () => card.classList.toggle("done");
-    prepend(card);
-    ding("ticket");
+    return card;
   }
 
-  function eventCard(kind, p){
+  function eventNode(kind, p, flash){
     const icons = {reservation:"📅", viewing:"🏠", lead:"⭐", handoff:"🙋", session_reset:"♻️"};
-    const titles = {reservation:"Reservación", viewing:"Visita agendada", lead:"Prospecto", handoff:"Pasar a humano", session_reset:"Sesión reiniciada"};
     let rows = "";
-    if(kind==="reservation") rows = kv("Mesa", `${p.size} personas`)+kv("Cuándo",p.datetime)+kv("Nombre",p.name)+kv("Tel",p.tel)+kv("Folio",p.id);
-    else if(kind==="viewing") rows = kv("Propiedad",p.titulo_es||p.listing_id)+kv("Zona",p.zona)+kv("Cuándo",p.datetime)+kv("Nombre",p.name)+kv("Tel",p.tel)+kv("Folio",p.id);
-    else if(kind==="lead") rows = kv("Nombre",p.name)+kv("Operación",p.operacion)+kv("Presupuesto",p.presupuesto_max?fmt(p.presupuesto_max):"—")+kv("Zona",p.zona||"—")+kv("Calidad",(p.tier||"").toUpperCase());
-    else if(kind==="handoff") rows = kv("Motivo",p.reason)+kv("Resumen",p.summary);
-    else rows = kv("Sesión", p.session||"");
+    if(kind==="reservation") rows = kv(t("k_table"), (p.size!=null?p.size+" "+t("k_people"):""))+kv(t("k_when"),p.datetime)+kv(t("k_name"),p.name)+kv(t("k_tel"),p.tel)+kv(t("k_folio"),p.id);
+    else if(kind==="viewing") rows = kv(t("k_property"),p.titulo_es||p.listing_id)+kv(t("k_zone"),p.zona)+kv(t("k_when"),p.datetime)+kv(t("k_name"),p.name)+kv(t("k_tel"),p.tel)+kv(t("k_folio"),p.id);
+    else if(kind==="lead") rows = kv(t("k_name"),p.name)+kv(t("k_operation"),p.operacion)+kv(t("k_budget"),p.presupuesto_max?fmt(p.presupuesto_max):"—")+kv(t("k_zone"),p.zona||"—")+kv(t("k_quality"),(p.tier||"").toUpperCase());
+    else if(kind==="handoff") rows = kv(t("k_reason"),p.reason)+kv(t("k_summary"),p.summary);
+    else rows = kv(t("k_session"), p.session||"");
     const card = document.createElement("div");
-    card.className = "card flash";
+    card.className = "card" + (flash ? " flash" : "");
     card.style.borderLeftColor = "#8a97a6";
     card.innerHTML = `
       <div class="chead">
-        <span class="tid">${icons[kind]||"🔔"} ${p.id||""}</span>
-        <span class="badge b-event">${titles[kind]||kind}</span>
+        <span class="tid">${icons[kind]||"🔔"} ${esc(p.id||"")}</span>
+        <span class="badge b-event">${t("t_"+kind)}</span>
         <span class="when">${timeStr(Date.now())}</span>
       </div>
       <div class="cbody"><div class="kv">${rows}</div></div>`;
-    prepend(card);
-    ding("event");
+    return card;
   }
-  const kv = (k,v)=> v!==undefined&&v!==null&&v!==""?`<div><b>${k}:</b> ${esc(String(v))}</div>`:"";
-  function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+  function nodeFor(type, payload, flash){
+    return type === "ticket" ? ticketNode(payload, flash) : eventNode(type, payload, flash);
+  }
+
+  function showEmpty(){
+    grid.innerHTML = `<div class="empty" id="empty"><div class="big">${(cfg.branding&&cfg.branding.emoji)||"🍽️"}</div><div>${t("empty")}</div></div>`;
+  }
+
+  function renderAll(){
+    grid.innerHTML = "";
+    if(!EVENTS.length){ showEmpty(); return; }
+    EVENTS.forEach(e => grid.appendChild(nodeFor(e.type, e.payload, false)));
+  }
+
+  function onEvent(type, payload){
+    if(FILTER_BIZ && payload && payload.business && payload.business !== FILTER_BIZ) return;
+    if(type === "ticket"){
+      tickets++; sales += Number(payload.total||0);
+      (payload.items||[]).forEach(i => items += Number(i.qty||0));
+      $("s-tickets").textContent = tickets; $("s-items").textContent = items; $("s-sales").textContent = fmt(sales);
+    }
+    if(!EVENTS.length){ grid.innerHTML = ""; }
+    EVENTS.unshift({type, payload});
+    grid.insertBefore(nodeFor(type, payload, true), grid.firstChild);
+    ding(type === "ticket" ? "ticket" : "event");
+  }
 
   // ── SSE ──
   function connect(){
     const es = new EventSource("/events");
-    es.onopen = () => { $("dot").className="dot live"; $("connlabel").textContent="en vivo"; };
-    es.onerror = () => { $("dot").className="dot"; $("connlabel").textContent="reconectando…"; };
+    es.onopen = () => setConn("live");
+    es.onerror = () => setConn("reconnecting");
     es.onmessage = (ev) => {
       let e; try{ e=JSON.parse(ev.data);}catch{return;}
       if(!e||!e.type) return;
-      if(FILTER_BIZ && e.payload && e.payload.business && e.payload.business !== FILTER_BIZ) return; // board scoped to one business
-      if(e.type==="ticket") ticketCard(e.payload);
-      else eventCard(e.type, e.payload||{});
+      onEvent(e.type, e.payload||{});
     };
   }
+
+  applyStatic();
+  setConn("connecting");
   connect();
 })();
 </script>
