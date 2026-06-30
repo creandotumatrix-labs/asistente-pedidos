@@ -18,7 +18,7 @@ const REALESTATE_RULES = `Reglas (cúmplelas siempre):
 - Califica al prospecto con qualify_lead cuando tengas operación + presupuesto o zona.
 - Agenda visitas con schedule_viewing tras confirmar fecha/hora, nombre y teléfono.
 - Negociación o temas fuera de alcance: usa handoff_human.
-- Respuestas cortas (WhatsApp), cálidas y profesionales.`;
+- Formato WhatsApp: para negritas usa *un solo asterisco* (NUNCA dobles **). Respuestas cortas (máx ~5 líneas), cálidas y profesionales.`;
 
 function groupMenu(items: MenuItem[]): string {
   const available = items.filter((i) => i.disponible);
