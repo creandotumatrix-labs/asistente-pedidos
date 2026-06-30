@@ -1,0 +1,89 @@
+{
+  "moneda": "MXN",
+  "categorias": ["Entradas", "Principales", "Postres", "Vinos y Bebidas"],
+  "items": [
+    {
+      "id": "aguachile_callo",
+      "nombre_es": "Aguachile de callo de hacha",
+      "categoria": "Entradas",
+      "precio_mxn": 285,
+      "descripcion_es": "Callo de hacha, leche de tigre de chile serrano, aguacate y cítricos.",
+      "modificadores": [{ "id": "sin_picante", "nombre_es": "sin picante" }],
+      "alergenos": ["mariscos"],
+      "disponible": true
+    },
+    {
+      "id": "burrata_huerto",
+      "nombre_es": "Burrata del huerto",
+      "categoria": "Entradas",
+      "precio_mxn": 240,
+      "descripcion_es": "Burrata, jitomates heirloom, albahaca y aceite de oliva.",
+      "modificadores": [],
+      "alergenos": ["lacteos"],
+      "disponible": true
+    },
+    {
+      "id": "robalo_pibil",
+      "nombre_es": "Robalo en recado",
+      "categoria": "Principales",
+      "precio_mxn": 480,
+      "descripcion_es": "Robalo confitado en recado yucateco, puré de plátano macho.",
+      "modificadores": [],
+      "alergenos": ["pescado"],
+      "disponible": true
+    },
+    {
+      "id": "rib_eye",
+      "nombre_es": "Rib eye madurado 350g",
+      "categoria": "Principales",
+      "precio_mxn": 620,
+      "descripcion_es": "Rib eye de maduración 28 días, médula y chimichurri de la casa.",
+      "modificadores": [
+        { "id": "termino_medio", "nombre_es": "término medio" },
+        { "id": "termino_tres_cuartos", "nombre_es": "tres cuartos" }
+      ],
+      "alergenos": [],
+      "disponible": true
+    },
+    {
+      "id": "risotto_hongos",
+      "nombre_es": "Risotto de hongos",
+      "categoria": "Principales",
+      "precio_mxn": 360,
+      "descripcion_es": "Arroz carnaroli, hongos de temporada y parmesano.",
+      "modificadores": [{ "id": "sin_gluten", "nombre_es": "sin gluten" }],
+      "alergenos": ["lacteos"],
+      "disponible": true
+    },
+    {
+      "id": "fondant_chocolate",
+      "nombre_es": "Fondant de chocolate",
+      "categoria": "Postres",
+      "precio_mxn": 160,
+      "descripcion_es": "Coulant tibio de chocolate 70% con helado de vainilla.",
+      "modificadores": [],
+      "alergenos": ["lacteos", "huevo", "gluten"],
+      "disponible": true
+    },
+    {
+      "id": "vino_copa_tinto",
+      "nombre_es": "Copa de vino tinto de la casa",
+      "categoria": "Vinos y Bebidas",
+      "precio_mxn": 180,
+      "descripcion_es": "Selección del sommelier, tinto de Valle de Guadalupe.",
+      "modificadores": [],
+      "alergenos": ["sulfitos"],
+      "disponible": true
+    },
+    {
+      "id": "agua_mineral",
+      "nombre_es": "Agua mineral 750ml",
+      "categoria": "Vinos y Bebidas",
+      "precio_mxn": 60,
+      "descripcion_es": "Agua mineral con gas, servicio a la mesa.",
+      "modificadores": [],
+      "alergenos": [],
+      "disponible": true
+    }
+  ]
+}
