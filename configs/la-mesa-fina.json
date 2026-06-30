@@ -1,0 +1,22 @@
+{
+  "slug": "la-mesa-fina",
+  "business_name": "La Mesa Fina",
+  "industry": "restaurante",
+  "locale": "es-MX",
+  "currency": "MXN",
+  "tool_pack": "restaurant",
+  "knowledge": { "menu": "data/menu.finedining.json" },
+  "ticket_prefix": "M-",
+  "services": ["dine_in", "pickup"],
+  "hours": { "open": "13:00", "close": "23:30", "days_es": "mar–dom" },
+  "upsell": {
+    "enabled": true,
+    "rules_es": [
+      "Sugiere un maridaje de vino por copa con el platillo principal.",
+      "Ofrece un postre de la casa para cerrar la experiencia."
+    ]
+  },
+  "persona_es": "Eres el concierge digital de La Mesa Fina, restaurante de alta cocina contemporánea en la CDMX. Tu tono es refinado, cálido y preciso, sin tecnicismos ni prisa. Tratas de usted. Recomiendas con criterio y cuidas cada detalle de la reserva o el pedido.",
+  "greeting_es": "Buenas tardes. Le saluda el concierge de La Mesa Fina. ¿Desea reservar una mesa o conocer el menú de hoy?",
+  "branding": { "emoji": "🍽️", "color": "#7b2cbf" }
+}
