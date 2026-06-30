@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://asistente-pedidos/schemas/ticket.schema.json",
+  "title": "KitchenTicket",
+  "description": "Structured kitchen/POS ticket emitted by emit_ticket. Stable contract a POS or KDS can consume.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ticket_id",
+    "channel",
+    "business",
+    "created_at",
+    "service",
+    "customer",
+    "items",
+    "subtotal",
+    "total",
+    "currency",
+    "status"
+  ],
+  "properties": {
+    "ticket_id": { "type": "string", "examples": ["A-241"] },
+    "channel": { "type": "string", "examples": ["whatsapp", "voice"] },
+    "business": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["pickup", "delivery", "dine_in"] },
+        "time": { "type": ["string", "null"] },
+        "address": { "type": ["string", "null"] }
+      }
+    },
+    "customer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "qty", "unit_price", "line_total"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "qty": { "type": "integer", "minimum": 1 },
+          "mods": { "type": "array", "items": { "type": "string" } },
+          "unit_price": { "type": "number", "minimum": 0 },
+          "line_total": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "subtotal": { "type": "number", "minimum": 0 },
+    "total": { "type": "number", "minimum": 0 },
+    "currency": { "type": "string", "examples": ["MXN"] },
+    "notes": { "type": "string" },
+    "status": { "type": "string", "enum": ["new"] }
+  }
+}
