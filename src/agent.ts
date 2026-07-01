@@ -39,7 +39,10 @@ export async function runAgent(session: Session, userText: string, emit: Emit): 
 
   const system = buildSystemPrompt(config, { menu, listings });
   const ctx: ToolContext = { session, config, emit, now: () => new Date(), menu, listings };
+  const meta = { business: config.business_name, slug: config.slug, session: session.id };
 
+  // Stream the customer's turn to the live board (agentic activity feed).
+  emit("agent_turn", { ...meta, text: userText });
   session.messages.push({ role: "user", content: userText });
   const out: string[] = [];
 
@@ -55,7 +58,10 @@ export async function runAgent(session: Session, userText: string, emit: Emit): 
     session.messages.push({ role: "assistant", content: resp.content });
 
     for (const block of resp.content) {
-      if (block.type === "text" && block.text.trim()) out.push(block.text.trim());
+      if (block.type === "text" && block.text.trim()) {
+        out.push(block.text.trim());
+        emit("agent_say", { ...meta, text: block.text.trim() }); // agent reasoning/reply → board
+      }
     }
 
     const toolUses = resp.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
@@ -72,6 +78,8 @@ export async function runAgent(session: Session, userText: string, emit: Emit): 
       } catch (e) {
         result = { ok: false, error: "excepcion", message: e instanceof Error ? e.message : String(e) };
       }
+      const ok = !!(result && typeof result === "object" && (result as { ok?: unknown }).ok !== false);
+      emit("tool_call", { ...meta, tool: tu.name, input: (tu.input ?? {}) as Record<string, unknown>, ok }); // live tool call → board
       results.push({ type: "tool_result", tool_use_id: tu.id, content: JSON.stringify(result) });
     }
     session.messages.push({ role: "user", content: results });

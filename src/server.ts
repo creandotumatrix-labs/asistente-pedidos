@@ -46,7 +46,7 @@ const RESET_WORDS = new Set(["reset", "reiniciar", "reinicia", "nuevo", "nuevo p
 const backlog: FeedEvent[] = [];
 bus.on("feed", (e: FeedEvent) => {
   backlog.push(e);
-  if (backlog.length > 40) backlog.shift();
+  if (backlog.length > 150) backlog.shift(); // keep recent agent activity for late-joining boards
 });
 
 // Deterministic order confirmation, appended after a ticket emits so the customer
@@ -74,12 +74,15 @@ async function handleInbound(inbound: TwilioInbound | MetaInbound, businessSlug:
   if (!text) return [cfg.greeting_es ?? "¡Hola!"];
 
   let ticket: Record<string, unknown> | null = null;
+  // Agentic activity (customer turn, tool calls, agent replies) is live-only: it
+  // drives the board's real-time stream but isn't persisted to the events table.
+  const EPHEMERAL = new Set(["agent_turn", "agent_say", "tool_call"]);
   const emit = (event: string, payload: Record<string, unknown>) => {
     emitFeed(event, payload);
     if (event === "ticket") {
       ticket = payload;
       void saveTicket(payload);
-    } else {
+    } else if (!EPHEMERAL.has(event)) {
       void saveEvent(event, payload);
     }
   };
