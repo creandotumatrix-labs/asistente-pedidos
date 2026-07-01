@@ -49,7 +49,7 @@
   .phead .ic{width:32px;height:32px;border-radius:.6rem;display:grid;place-items:center;font-size:15px}
   .phead h2{font-family:var(--disp);font-size:15px;margin:0;font-weight:700;letter-spacing:.01em}
   .phead .cnt{margin-left:auto;font-size:11px;color:var(--dim);font-family:var(--mono)}
-  #stream{padding:16px 18px;display:flex;flex-direction:column;gap:11px;height:76vh;overflow-y:auto;scroll-behavior:smooth}
+  #stream{padding:16px 18px;display:flex;flex-direction:column;gap:11px;height:60vh;overflow-y:auto;scroll-behavior:smooth}
   #stream::-webkit-scrollbar,#grid::-webkit-scrollbar{width:8px}
   #stream::-webkit-scrollbar-thumb,#grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:8px}
   .ev{animation:slide .34s cubic-bezier(.2,.8,.2,1) both}
@@ -113,6 +113,16 @@
   .bump:hover{filter:brightness(1.08)}
   .kv{font-size:13px;line-height:1.65}.kv b{color:#fff}
   .note{margin-top:8px;font-size:12px;color:#fcd34d}
+  .composer{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:9px;background:rgba(255,255,255,.02)}
+  .quick{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .qchip{font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer;transition:.15s}
+  .qchip:hover{border-color:var(--p);color:var(--ink)}
+  .crow{display:flex;gap:9px}
+  .crow input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:.75rem;padding:12px 14px;color:var(--ink);font-size:14px;outline:none}
+  .crow input:focus{border-color:var(--p)}
+  .crow input::placeholder{color:var(--dim)}
+  .crow button{background:var(--p);color:#0a0b10;border:0;border-radius:.75rem;padding:0 18px;font-size:16px;cursor:pointer;display:grid;place-items:center;min-width:52px}
+  .crow button:disabled{opacity:.5;cursor:default}
 </style>
 </head>
 <body>
@@ -141,6 +151,13 @@
         <span class="pill" style="padding:4px 10px"><span class="dot live"></span><span id="agentlive"></span></span>
         <span class="cnt" id="streamcnt"></span></div>
       <div id="stream"></div>
+      <div class="composer">
+        <div class="quick" id="quick"></div>
+        <form class="crow" id="composer">
+          <input id="msg" autocomplete="off" />
+          <button type="submit" id="send" title="Enviar"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
     </section>
     <section class="panel glass">
       <div class="phead"><div class="ic tint"><i class="fas fa-receipt"></i></div><h2 id="p-board"></h2><span class="cnt" id="gridcnt"></span></div>
@@ -159,7 +176,7 @@
       p_agent:"El agente, en tiempo real",p_board:"Pedidos listos · Cocina",agentlive:"razonando en vivo",aipill:"Asistente IA en vivo",
       lg_a:"Izquierda:",lg_a2:"el agente razona y actúa en vivo",lg_b:"Derecha:",lg_b2:"los pedidos que genera, listos para cocina",
       empty_agent:"Listo y esperando.",empty_hint:"Envía un mensaje por WhatsApp y míralo atender en vivo.",empty_board:"Aún no hay pedidos.",
-      customer:"Cliente",agent:"Agente",thinking:"El agente está pensando…",channel:"canal",bump:"Listo ✓",
+      customer:"Cliente",agent:"Agente",thinking:"El agente está pensando…",channel:"canal",bump:"Listo ✓",ph:"Escribe un mensaje, como en WhatsApp…",sending:"enviando…",try:"Pruébalo:",
       emit_ticket:"Pedido enviado a cocina",emit_reservation:"Reservación creada",emit_viewing:"Visita agendada",emit_lead:"Prospecto calificado",emit_handoff:"Transferido a un asesor",reset:"— nueva conversación —",
       svc_pickup:"Para llevar",svc_delivery:"Entrega",svc_dine_in:"En sitio",
       t_reservation:"Reservación",t_viewing:"Visita",t_lead:"Prospecto",t_handoff:"A humano",
@@ -170,7 +187,7 @@
       p_agent:"The agent, in real time",p_board:"Orders ready · Kitchen",agentlive:"reasoning live",aipill:"AI assistant · live",
       lg_a:"Left:",lg_a2:"the agent reasons and acts live",lg_b:"Right:",lg_b2:"the orders it produces, ready for the kitchen",
       empty_agent:"Ready and waiting.",empty_hint:"Send a WhatsApp message and watch it work live.",empty_board:"No orders yet.",
-      customer:"Customer",agent:"Agent",thinking:"The agent is thinking…",channel:"channel",bump:"Done ✓",
+      customer:"Customer",agent:"Agent",thinking:"The agent is thinking…",channel:"channel",bump:"Done ✓",ph:"Type a message, like on WhatsApp…",sending:"sending…",try:"Try it:",
       emit_ticket:"Order sent to kitchen",emit_reservation:"Reservation created",emit_viewing:"Viewing booked",emit_lead:"Lead qualified",emit_handoff:"Handed to an advisor",reset:"— new conversation —",
       svc_pickup:"Takeout",svc_delivery:"Delivery",svc_dine_in:"Dine-in",
       t_reservation:"Reservation",t_viewing:"Viewing",t_lead:"Lead",t_handoff:"To human",
@@ -237,8 +254,8 @@
     $("logo").textContent=(c.branding&&c.branding.emoji)||"🍽️";
     $("bizname").textContent=c.business_name||"Live Ops";
     document.title=(c.business_name||"Live Ops")+" · IA en vivo";
-    currency=c.currency||"MXN"; applyStatic(); renderAll();
-  }).catch(()=>{applyStatic();renderAll();});
+    currency=c.currency||"MXN"; applyStatic(); renderAll(); renderComposer();
+  }).catch(()=>{applyStatic();renderAll();renderComposer();});
 
   $("sound").onclick=()=>{soundOn=!soundOn;applyStatic();if(soundOn&&!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(soundOn&&audio&&audio.state==="suspended")audio.resume();};
   function ding(kind){if(!soundOn||!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.type="sine";
@@ -247,7 +264,7 @@
     o.start();o.stop(audio.currentTime+0.32);
     if(kind==="ticket"){const o2=audio.createOscillator();o2.connect(g);o2.type="sine";o2.frequency.setValueAtTime(1320,audio.currentTime+0.11);o2.start(audio.currentTime+0.11);o2.stop(audio.currentTime+0.33);}}
 
-  $("lang").addEventListener("click",(ev)=>{const b=ev.target.closest("button");if(!b||b.dataset.lang===LANG)return;LANG=b.dataset.lang;localStorage.setItem("ui_lang",LANG);applyStatic();$("s-sales").textContent=fmt(sales);renderAll();});
+  $("lang").addEventListener("click",(ev)=>{const b=ev.target.closest("button");if(!b||b.dataset.lang===LANG)return;LANG=b.dataset.lang;localStorage.setItem("ui_lang",LANG);applyStatic();$("s-sales").textContent=fmt(sales);renderAll();renderComposer();});
 
   function clearThink(){ if(thinkEl){thinkEl.remove();thinkEl=null;} }
   function showThink(){ clearThink(); const d=document.createElement("div"); d.className="think ev"; d.innerHTML=`<i class="fas fa-robot txt-p"></i> ${esc(t("thinking"))} <span class="d"><i></i><i></i><i></i></span>`; stream.appendChild(d); thinkEl=d; stream.scrollTop=stream.scrollHeight; }
@@ -323,7 +340,33 @@
     es.onopen=()=>setConn("live"); es.onerror=()=>setConn("reconnecting");
     es.onmessage=(ev)=>{let e;try{e=JSON.parse(ev.data);}catch{return;}if(!e||!e.type)return;onEvent(e.type,e.payload||{},e.at);};
   }
-  applyStatic(); setConn("connecting"); renderAll(); connect();
+  // ── interactive composer: drives the agent from the board ──
+  const SID = localStorage.getItem("demo_sid") || (()=>{const s="web-"+Math.random().toString(36).slice(2,9);localStorage.setItem("demo_sid",s);return s;})();
+  const PROMPTS={
+    restaurant:{es:["Quiero 3 tacos de pastor con todo y un agua de horchata","¿Qué me recomiendas para 2?","Una mesa para 4 el viernes 9pm"],
+                en:["I want 3 pastor tacos with everything and a horchata","What do you recommend for 2?","A table for 4 on Friday 9pm"]},
+    realestate:{es:["Busco renta en la Condesa, 2 recámaras, hasta 40 mil","¿Qué tienen en venta en Polanco?","Agéndame una visita el jueves 5pm"],
+                en:["Looking to rent in Condesa, 2 bedrooms, up to 40k","What's for sale in Polanco?","Book a viewing Thursday 5pm"]}
+  };
+  const msgInput=$("msg"), sendBtn=$("send"); let sending=false;
+  function renderComposer(){
+    if(!msgInput) return;
+    msgInput.placeholder=t("ph");
+    const pack=(cfg.tool_pack==="realestate")?"realestate":"restaurant";
+    const list=PROMPTS[pack][LANG]||PROMPTS[pack].es;
+    $("quick").innerHTML=`<span style="font-size:11px;color:var(--dim)">${t("try")}</span>`+list.map((p,i)=>`<span class="qchip" data-q="${i}">${esc(p)}</span>`).join("");
+    [...$("quick").querySelectorAll(".qchip")].forEach(c=>c.onclick=()=>send(list[+c.dataset.q]));
+  }
+  async function send(text){
+    text=(text!=null?text:msgInput.value).trim(); if(!text||sending)return;
+    sending=true; sendBtn.disabled=true; const old=msgInput.value; msgInput.value=""; msgInput.placeholder=t("sending");
+    try{ await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,business:cfg.slug,session:SID})}); }
+    catch(e){ msgInput.value=old; }
+    sending=false; sendBtn.disabled=false; msgInput.placeholder=t("ph"); msgInput.focus();
+  }
+  $("composer").addEventListener("submit",(e)=>{e.preventDefault();send();});
+
+  applyStatic(); setConn("connecting"); renderComposer(); renderAll(); connect();
 })();
 </script>
 </body>
