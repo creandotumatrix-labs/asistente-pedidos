@@ -207,6 +207,23 @@ app.get("/api/listings", async (req: Request, res: Response) => {
   }
 });
 
+// Interactive "try it" endpoint — drives the agent from the board's composer.
+// Reuses the exact WhatsApp inbound path, so agent activity streams to the board
+// (SSE) and tickets persist — no phone number or channel credentials required.
+app.post("/api/chat", express.json(), async (req: Request, res: Response) => {
+  try {
+    const businessSlug = resolveBiz(typeof req.body?.business === "string" ? req.body.business : undefined);
+    const text = String(req.body?.text ?? "").trim();
+    const sid = String(req.body?.session ?? "anon").replace(/[^\w-]/g, "").slice(0, 40) || "anon";
+    if (!text) return res.json({ ok: true, replies: [] });
+    const inbound = { from: `web:${sid}`, text, profileName: "Web" } as TwilioInbound;
+    const replies = await handleInbound(inbound, businessSlug);
+    res.json({ ok: true, business: businessSlug, replies });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+  }
+});
+
 app.get("/healthz", (_req: Request, res: Response) =>
   res.json({ ok: true, business: config.slug, channel: CHANNEL, businesses: [...KNOWN_BUSINESSES] }),
 );
