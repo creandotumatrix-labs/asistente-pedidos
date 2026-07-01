@@ -18,6 +18,7 @@ import {
 } from "./channels/twilio.ts";
 import { parseMetaInbound, verifyMetaChallenge, sendMeta, type Inbound as MetaInbound } from "./channels/meta.ts";
 import { migrate, saveTicket, saveEvent, dbEnabled, stats } from "./db.ts";
+import { wireIntegrations } from "./integrations/index.ts";
 
 // Native .env loading (Node >=20.6) — no dotenv dependency.
 try {
@@ -231,6 +232,7 @@ app.get("/", (_req: Request, res: Response) => res.redirect("/kitchen"));
 
 async function start() {
   await migrate().catch((e) => console.error("[db] migración falló:", e));
+  wireIntegrations();
   app.listen(PORT, () => {
     console.log(`\n  🌮  Asistente de Pedidos  (multi-negocio)`);
     console.log(`  ├─ default:  ${config.business_name}  (${config.slug})`);
