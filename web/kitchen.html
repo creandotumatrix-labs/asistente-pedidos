@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Live Ops</title>
+<title>Asistente de Pedidos · en vivo</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -113,6 +113,9 @@
   .bump:hover{filter:brightness(1.08)}
   .kv{font-size:13px;line-height:1.65}.kv b{color:#fff}
   .note{margin-top:8px;font-size:12px;color:#fcd34d}
+  .skel{color:transparent!important;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.2),rgba(255,255,255,.08));background-size:200% 100%;animation:shimmer 1.3s linear infinite;border-radius:6px;min-width:40px;display:inline-block;height:.9em;vertical-align:middle}
+  @keyframes shimmer{to{background-position:-200% 0}}
+  .stat b.nostat{font-size:11.5px;color:var(--muted);font-weight:600;font-family:-apple-system,sans-serif;line-height:1.7}
   .composer{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:9px;background:rgba(255,255,255,.02)}
   .quick{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
   .qchip{font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer;transition:.15s}
@@ -128,14 +131,14 @@
 <body>
   <header>
     <div class="logo" id="logo"><i class="fas fa-utensils"></i></div>
-    <div class="brand"><h1 id="bizname">Live Ops</h1>
+    <div class="brand"><h1 id="bizname">Asistente de Pedidos</h1>
       <div class="sub"><span class="aipill"><i class="fas fa-robot"></i> <span id="aipill">Asistente IA en vivo</span></span> <span id="bizsub"></span></div></div>
     <span class="pill"><span class="dot" id="dot"></span><span id="connlabel"></span></span>
     <div class="spacer"></div>
     <div class="stats">
-      <div class="stat"><b id="s-tickets">0</b><span id="l-tickets"></span></div>
-      <div class="stat"><b id="s-tools">0</b><span id="l-tools"></span></div>
-      <div class="stat"><b id="s-sales">$0</b><span id="l-sales"></span></div>
+      <div class="stat"><b id="s-tickets" class="skel">·</b><span id="l-tickets"></span></div>
+      <div class="stat"><b id="s-tools" class="skel">·</b><span id="l-tools"></span></div>
+      <div class="stat"><b id="s-sales" class="skel">·</b><span id="l-sales"></span></div>
     </div>
     <div class="lang" id="lang"><button data-lang="es">ES</button><button data-lang="en">EN</button></div>
     <button class="btn" id="sound"></button>
@@ -172,8 +175,8 @@
 
   const I18N = {
     es:{connecting:"conectando…",live:"en vivo",reconnecting:"reconectando…",offline:"sin conexión",
-      tickets:"pedidos",tools:"acciones IA",sales:"ventas",sound_on:"Sonido",sound_off:"Sonido",
-      p_agent:"El agente, en tiempo real",p_board:"Pedidos listos · Cocina",agentlive:"razonando en vivo",aipill:"Asistente IA en vivo",
+      tickets:"pedidos",tools:"acciones IA",sales:"ventas",e_tickets:"Sin pedidos",e_tools:"Sin actividad",e_sales:"—",sound_on:"Sonido",sound_off:"Sonido",
+      p_agent:"El agente, en tiempo real",p_board:"Pedidos listos · Cocina",agentlive:"razonando en vivo",aipill:"Asistente de Pedidos",
       lg_a:"Izquierda:",lg_a2:"el agente razona y actúa en vivo",lg_b:"Derecha:",lg_b2:"los pedidos que genera, listos para cocina",
       empty_agent:"Listo y esperando.",empty_hint:"Envía un mensaje por WhatsApp y míralo atender en vivo.",empty_board:"Aún no hay pedidos.",
       customer:"Cliente",agent:"Agente",thinking:"El agente está pensando…",channel:"canal",bump:"Listo ✓",ph:"Escribe un mensaje, como en WhatsApp…",sending:"enviando…",try:"Pruébalo:",
@@ -183,8 +186,8 @@
       k_table:"Mesa",k_people:"personas",k_when:"Cuándo",k_name:"Nombre",k_tel:"Tel",k_folio:"Folio",
       k_property:"Propiedad",k_zone:"Zona",k_operation:"Operación",k_budget:"Presupuesto",k_quality:"Calidad",k_reason:"Motivo",k_summary:"Resumen"},
     en:{connecting:"connecting…",live:"live",reconnecting:"reconnecting…",offline:"offline",
-      tickets:"orders",tools:"AI actions",sales:"sales",sound_on:"Sound",sound_off:"Sound",
-      p_agent:"The agent, in real time",p_board:"Orders ready · Kitchen",agentlive:"reasoning live",aipill:"AI assistant · live",
+      tickets:"orders",tools:"AI actions",sales:"sales",e_tickets:"No orders yet",e_tools:"No activity",e_sales:"—",sound_on:"Sound",sound_off:"Sound",
+      p_agent:"The agent, in real time",p_board:"Orders ready · Kitchen",agentlive:"reasoning live",aipill:"Order Assistant",
       lg_a:"Left:",lg_a2:"the agent reasons and acts live",lg_b:"Right:",lg_b2:"the orders it produces, ready for the kitchen",
       empty_agent:"Ready and waiting.",empty_hint:"Send a WhatsApp message and watch it work live.",empty_board:"No orders yet.",
       customer:"Customer",agent:"Agent",thinking:"The agent is thinking…",channel:"channel",bump:"Done ✓",ph:"Type a message, like on WhatsApp…",sending:"sending…",try:"Try it:",
@@ -245,6 +248,9 @@
     document.documentElement.lang=LANG==="en"?"en":"es-MX";
   }
   function setConn(s){connState=s;$("dot").className="dot"+(s==="live"?" live":"");$("connlabel").textContent=t(s);}
+  const EMPTY_STAT={"s-tickets":"e_tickets","s-tools":"e_tools","s-sales":"e_sales"};
+  function setStat(id,val){const el=$(id);if(!el)return;el.classList.remove("skel");if(val>0){el.classList.remove("nostat");el.textContent=id==="s-sales"?fmt(val):String(val);}else{el.classList.add("nostat");el.textContent=t(EMPTY_STAT[id]);}}
+  function settleStats(){setStat("s-tickets",tickets);setStat("s-tools",toolcalls);setStat("s-sales",sales);}
 
   const QBIZ=new URLSearchParams(location.search).get("business");
   let FILTER_BIZ=null;
@@ -252,8 +258,8 @@
     cfg=c||{}; if(QBIZ) FILTER_BIZ=c.business_name||null;
     if(c.branding&&c.branding.color) document.documentElement.style.setProperty("--p",c.branding.color);
     $("logo").textContent=(c.branding&&c.branding.emoji)||"🍽️";
-    $("bizname").textContent=c.business_name||"Live Ops";
-    document.title=(c.business_name||"Live Ops")+" · IA en vivo";
+    $("bizname").textContent=c.business_name||"Asistente de Pedidos";
+    document.title=(c.business_name||"Asistente de Pedidos")+" · en vivo";
     currency=c.currency||"MXN"; applyStatic(); renderAll(); renderComposer();
   }).catch(()=>{applyStatic();renderAll();renderComposer();});
 
@@ -264,7 +270,7 @@
     o.start();o.stop(audio.currentTime+0.32);
     if(kind==="ticket"){const o2=audio.createOscillator();o2.connect(g);o2.type="sine";o2.frequency.setValueAtTime(1320,audio.currentTime+0.11);o2.start(audio.currentTime+0.11);o2.stop(audio.currentTime+0.33);}}
 
-  $("lang").addEventListener("click",(ev)=>{const b=ev.target.closest("button");if(!b||b.dataset.lang===LANG)return;LANG=b.dataset.lang;localStorage.setItem("ui_lang",LANG);applyStatic();$("s-sales").textContent=fmt(sales);renderAll();renderComposer();});
+  $("lang").addEventListener("click",(ev)=>{const b=ev.target.closest("button");if(!b||b.dataset.lang===LANG)return;LANG=b.dataset.lang;localStorage.setItem("ui_lang",LANG);applyStatic();settleStats();renderAll();renderComposer();});
 
   function clearThink(){ if(thinkEl){thinkEl.remove();thinkEl=null;} }
   function showThink(){ clearThink(); const d=document.createElement("div"); d.className="think ev"; d.innerHTML=`<i class="fas fa-robot txt-p"></i> ${esc(t("thinking"))} <span class="d"><i></i><i></i><i></i></span>`; stream.appendChild(d); thinkEl=d; stream.scrollTop=stream.scrollHeight; }
@@ -328,16 +334,16 @@
     if(FILTER_BIZ&&p&&p.business&&p.business!==FILTER_BIZ)return;
     if(type==="agent_turn"){pushStream({kind:"agent_turn",payload:p,at},true);return;} // show 'thinking' after the customer msg
     if(type==="agent_say"){pushStream({kind:"agent_say",payload:p,at});return;}
-    if(type==="tool_call"){toolcalls++;$("s-tools").textContent=toolcalls;pushStream({kind:"tool_call",payload:p,at},true);ding("tool");return;}
+    if(type==="tool_call"){toolcalls++;setStat("s-tools",toolcalls);pushStream({kind:"tool_call",payload:p,at},true);ding("tool");return;}
     if(type==="session_reset"){pushStream({kind:"reset",payload:p,at});return;}
     const m=EMIT_META[type]; if(m){const ref=type==="ticket"?(p.ticket_id||""):(p.id||"");pushStream({kind:"emit",payload:{icon:m.icon,label:t(m.label),ref,total:type==="ticket"?p.total:null},at});}
-    if(type==="ticket"){tickets++;sales+=Number(p.total||0);$("s-tickets").textContent=tickets;$("s-sales").textContent=fmt(sales);ding("ticket");pushCard("ticket",p);}
+    if(type==="ticket"){tickets++;sales+=Number(p.total||0);setStat("s-tickets",tickets);setStat("s-sales",sales);ding("ticket");pushCard("ticket",p);}
     else if(type==="reservation"||type==="viewing"||type==="lead"||type==="handoff"){ding("event");pushCard(type,p);}
   }
 
   function connect(){
     const es=new EventSource("/events");
-    es.onopen=()=>setConn("live"); es.onerror=()=>setConn("reconnecting");
+    es.onopen=()=>{setConn("live");setTimeout(settleStats,1500);}; es.onerror=()=>setConn("reconnecting");
     es.onmessage=(ev)=>{let e;try{e=JSON.parse(ev.data);}catch{return;}if(!e||!e.type)return;onEvent(e.type,e.payload||{},e.at);};
   }
   // ── interactive composer: drives the agent from the board ──
@@ -366,7 +372,7 @@
   }
   $("composer").addEventListener("submit",(e)=>{e.preventDefault();send();});
 
-  applyStatic(); setConn("connecting"); renderComposer(); renderAll(); connect();
+  applyStatic(); setConn("connecting"); renderComposer(); renderAll(); connect(); setTimeout(settleStats,4000);
 })();
 </script>
 </body>
