@@ -7,372 +7,392 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{ --p:#FF8000; --a:#47C7FC; --bg1:#090a0f; --bg2:#12141d;
-    --ink:#eef0f5; --muted:#8b93a3; --dim:#5c6472; --line:rgba(255,255,255,.09);
-    --pickup:#f5a524; --delivery:#3b82f6; --dine_in:#22c55e; --green:#22c55e; --red:#ef4444;
-    --disp:'Space Grotesk',system-ui,sans-serif; --mono:ui-monospace,'SF Mono',Menlo,monospace; }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%}
-  body{background:linear-gradient(to bottom right,var(--bg1),var(--bg2),var(--bg1));color:var(--ink);
-    font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
-  .disp{font-family:var(--disp);letter-spacing:-.01em}
-  .mono{font-family:var(--mono)}
-  .glass{background:rgba(255,255,255,.045);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:1.1rem}
-  .tint{background:color-mix(in srgb,var(--p) 18%,transparent);color:var(--p)}
-  .txt-p{color:var(--p)} .txt-a{color:var(--a)}
-  header{display:flex;align-items:center;gap:16px;padding:15px 24px;position:sticky;top:0;z-index:5;
-    background:rgba(9,10,15,.72);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-  .logo{width:46px;height:46px;border-radius:.8rem;display:grid;place-items:center;font-size:23px;background:color-mix(in srgb,var(--p) 22%,transparent);color:var(--p);flex-shrink:0;box-shadow:0 0 30px -8px var(--p)}
-  .brand h1{font-family:var(--disp);font-size:19px;margin:0;font-weight:700;white-space:nowrap;line-height:1.1}
-  .brand .sub{font-size:11.5px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px}
-  .aipill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--p);background:color-mix(in srgb,var(--p) 14%,transparent);border:1px solid color-mix(in srgb,var(--p) 30%,transparent);padding:2px 8px;border-radius:999px}
-  .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:12px;color:var(--muted)}
-  .dot{width:8px;height:8px;border-radius:50%;background:#415063}
-  .dot.live{background:var(--green);box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulse 1.8s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-  .spacer{flex:1}
-  .stats{display:flex;gap:10px}
-  .stat{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:.85rem;padding:8px 15px;text-align:center;min-width:80px}
-  .stat b{display:block;font-family:var(--disp);font-size:21px;line-height:1.05;color:#fff;font-variant-numeric:tabular-nums}
-  .stat span{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
-  .btn{background:rgba(255,255,255,.05);color:var(--ink);border:1px solid var(--line);border-radius:.65rem;padding:9px 13px;font-size:13px;cursor:pointer}
-  .btn:hover{border-color:var(--p)}
-  .lang{display:inline-flex;border:1px solid var(--line);border-radius:.65rem;overflow:hidden;background:rgba(255,255,255,.05)}
-  .lang button{background:transparent;color:var(--muted);border:0;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer}
-  .lang button.on{background:var(--p);color:#0a0b10}
-  .legend{display:flex;gap:22px;flex-wrap:wrap;padding:9px 24px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}
-  .legend b{color:var(--ink);font-weight:600}
-  main{display:grid;grid-template-columns:1.12fr .88fr;gap:18px;padding:18px 24px 44px;align-items:start}
-  @media(max-width:960px){main{grid-template-columns:1fr}}
-  .panel{display:flex;flex-direction:column;min-height:0}
-  .phead{display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--line)}
-  .phead .ic{width:32px;height:32px;border-radius:.6rem;display:grid;place-items:center;font-size:15px}
-  .phead h2{font-family:var(--disp);font-size:15px;margin:0;font-weight:700;letter-spacing:.01em}
-  .phead .cnt{margin-left:auto;font-size:11px;color:var(--dim);font-family:var(--mono)}
-  #stream{padding:16px 18px;display:flex;flex-direction:column;gap:11px;height:60vh;overflow-y:auto;scroll-behavior:smooth}
-  #stream::-webkit-scrollbar,#grid::-webkit-scrollbar{width:8px}
-  #stream::-webkit-scrollbar-thumb,#grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:8px}
-  .ev{animation:slide .34s cubic-bezier(.2,.8,.2,1) both}
-  @keyframes slide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-  .bubble{max-width:88%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.45}
-  .who{font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;display:flex;align-items:center;gap:6px;opacity:.9}
-  .ev-user{align-self:flex-end;text-align:right}
-  .ev-user .bubble{background:color-mix(in srgb,var(--green) 20%,transparent);border:1px solid color-mix(in srgb,var(--green) 32%,transparent);border-bottom-right-radius:4px;text-align:left}
-  .ev-user .who{color:#82e6ac;justify-content:flex-end}
-  .ev-agent{align-self:flex-start}
-  .ev-agent .bubble{background:rgba(255,255,255,.05);border:1px solid var(--line);border-bottom-left-radius:4px}
-  .ev-agent .who{color:var(--p)}
-  /* agent action row — client-legible */
-  .act{align-self:stretch;display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:13px;
-    background:color-mix(in srgb,var(--a) 6%,transparent);border:1px solid color-mix(in srgb,var(--a) 22%,transparent);
-    animation:slide .34s cubic-bezier(.2,.8,.2,1) both,actflash 1.6s ease}
-  @keyframes actflash{0%{background:color-mix(in srgb,var(--a) 20%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--a) 30%,transparent)}100%{background:color-mix(in srgb,var(--a) 6%,transparent);box-shadow:none}}
-  .act .ai{width:34px;height:34px;border-radius:.6rem;display:grid;place-items:center;font-size:15px;background:color-mix(in srgb,var(--a) 16%,transparent);color:var(--a);flex-shrink:0}
-  .act .lbl{font-weight:600;font-size:13.5px}
-  .act .det{color:var(--muted);font-size:12px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .act .tool{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:2px}
-  .act .ok{margin-left:auto;flex-shrink:0;font-size:15px}
-  .act .ok .g{color:var(--green)} .act .ok .r{color:var(--red)}
-  /* thinking shimmer */
-  .think{align-self:flex-start;display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);font-size:12.5px}
-  .think .d{display:flex;gap:4px}.think .d i{width:6px;height:6px;border-radius:50%;background:var(--p);animation:blink 1.2s infinite}
-  .think .d i:nth-child(2){animation-delay:.2s}.think .d i:nth-child(3){animation-delay:.4s}
-  @keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-  .emit{align-self:stretch;display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:13px;border-left:3px solid var(--p);
-    background:color-mix(in srgb,var(--p) 13%,transparent);font-size:13.5px;font-weight:600;animation:slide .34s ease both}
-  .emit .ei{color:var(--p);font-size:16px} .emit .arrow{margin-left:auto;color:var(--p)}
-  .divider{align-self:center;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;padding:6px 0}
-  .ev-time{font-size:9.5px;color:var(--dim);margin-top:3px}
-  .empty{text-align:center;color:var(--muted);padding:15vh 14px}
-  .empty .big{font-size:46px;margin-bottom:14px;color:var(--p);opacity:.55}
-  .empty .hint{font-size:13px;color:var(--dim);margin-top:8px}
-  #grid{padding:16px 18px;display:flex;flex-direction:column;gap:13px;height:76vh;overflow-y:auto}
-  .card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-left:4px solid var(--p);border-radius:13px;overflow:hidden;animation:slide .36s ease both}
-  .card.flash{box-shadow:0 0 0 2px color-mix(in srgb,var(--p) 55%,transparent);animation:slide .36s ease both,unflash 5s ease forwards}
-  @keyframes unflash{to{box-shadow:none}}
-  .card.done{opacity:.42;filter:saturate(.5)}
-  .chead{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
-  .tid{font-family:var(--disp);font-weight:700;font-size:17px}
-  .badge{font-size:10px;font-weight:800;letter-spacing:.6px;padding:4px 8px;border-radius:6px;text-transform:uppercase}
-  .b-pickup{background:rgba(245,165,36,.16);color:var(--pickup);border:1px solid rgba(245,165,36,.4)}
-  .b-delivery{background:rgba(59,130,246,.16);color:var(--delivery);border:1px solid rgba(59,130,246,.4)}
-  .b-dine_in{background:rgba(34,197,94,.16);color:var(--dine_in);border:1px solid rgba(34,197,94,.4)}
-  .b-event{background:rgba(138,151,166,.16);color:#cbd5e1;border:1px solid var(--line)}
-  .when{margin-left:auto;font-size:11.5px;color:var(--dim)}
-  .cbody{padding:12px 15px}
-  .line{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
-  .line:last-child{border-bottom:0}
-  .qty{font-weight:800;color:#fff;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:6px;min-width:30px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px}
-  .iname{font-weight:600}.mods{color:var(--muted);font-size:12px;margin-top:2px}
-  .lt{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}
-  .cfoot{display:flex;align-items:center;gap:12px;padding:12px 15px;border-top:1px solid var(--line);background:rgba(255,255,255,.03)}
-  .total{font-family:var(--disp);font-size:21px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
-  .total small{font-size:12px;color:var(--muted);font-weight:600;font-family:var(--mono)}
-  .cust{font-size:12px;color:var(--muted);line-height:1.3}
-  .bump{margin-left:auto;background:var(--p);color:#0a0b10;border:0;border-radius:8px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
-  .bump:hover{filter:brightness(1.08)}
-  .kv{font-size:13px;line-height:1.65}.kv b{color:#fff}
-  .note{margin-top:8px;font-size:12px;color:#fcd34d}
-  .skel{color:transparent!important;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.2),rgba(255,255,255,.08));background-size:200% 100%;animation:shimmer 1.3s linear infinite;border-radius:6px;min-width:40px;display:inline-block;height:.9em;vertical-align:middle}
-  @keyframes shimmer{to{background-position:-200% 0}}
-  .stat b.nostat{font-size:11.5px;color:var(--muted);font-weight:600;font-family:-apple-system,sans-serif;line-height:1.7}
-  .composer{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:9px;background:rgba(255,255,255,.02)}
-  .quick{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-  .qchip{font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer;transition:.15s}
-  .qchip:hover{border-color:var(--p);color:var(--ink)}
-  .crow{display:flex;gap:9px}
-  .crow input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:.75rem;padding:12px 14px;color:var(--ink);font-size:14px;outline:none}
-  .crow input:focus{border-color:var(--p)}
-  .crow input::placeholder{color:var(--dim)}
-  .crow button{background:var(--p);color:#0a0b10;border:0;border-radius:.75rem;padding:0 18px;font-size:16px;cursor:pointer;display:grid;place-items:center;min-width:52px}
-  .crow button:disabled{opacity:.5;cursor:default}
+:root{ --p:#FF8000; --a:#47C7FC; --bg1:#090a0f; --bg2:#12141d;
+--ink:#eef0f5; --muted:#8b93a3; --dim:#5c6472; --line:rgba(255,255,255,.09);
+--pickup:#f5a524; --delivery:#3b82f6; --dine_in:#22c55e; --green:#22c55e; --red:#ef4444;
+--disp:'Space Grotesk',system-ui,sans-serif; --mono:ui-monospace,'SF Mono',Menlo,monospace; }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:linear-gradient(to bottom right,var(--bg1),var(--bg2),var(--bg1));color:var(--ink);
+font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.disp{font-family:var(--disp);letter-spacing:-.01em}
+.mono{font-family:var(--mono)}
+.glass{background:rgba(255,255,255,.045);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:1.1rem}
+.tint{background:color-mix(in srgb,var(--p) 18%,transparent);color:var(--p)}
+.txt-p{color:var(--p)} .txt-a{color:var(--a)}
+header{display:flex;align-items:center;gap:16px;padding:15px 24px;position:sticky;top:0;z-index:5;
+background:rgba(9,10,15,.72);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.logo{width:46px;height:46px;border-radius:.8rem;display:grid;place-items:center;font-size:23px;background:color-mix(in srgb,var(--p) 22%,transparent);color:var(--p);flex-shrink:0;box-shadow:0 0 30px -8px var(--p)}
+.brand h1{font-family:var(--disp);font-size:19px;margin:0;font-weight:700;white-space:nowrap;line-height:1.1}
+.brand .sub{font-size:11.5px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:6px}
+.aipill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--p);background:color-mix(in srgb,var(--p) 14%,transparent);border:1px solid color-mix(in srgb,var(--p) 30%,transparent);padding:2px 8px;border-radius:999px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:#415063}
+.dot.live{background:var(--green);box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.spacer{flex:1}
+.stats{display:flex;gap:10px}
+.stat{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:.85rem;padding:8px 15px;text-align:center;min-width:80px}
+.stat b{display:block;font-family:var(--disp);font-size:21px;line-height:1.05;color:#fff;font-variant-numeric:tabular-nums}
+.stat span{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.btn{background:rgba(255,255,255,.05);color:var(--ink);border:1px solid var(--line);border-radius:.65rem;padding:9px 13px;font-size:13px;cursor:pointer}
+.btn:hover{border-color:var(--p)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:.65rem;overflow:hidden;background:rgba(255,255,255,.05)}
+.lang button{background:transparent;color:var(--muted);border:0;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer}
+.lang button.on{background:var(--p);color:#0a0b10}
+.legend{display:flex;gap:22px;flex-wrap:wrap;padding:9px 24px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}
+.legend b{color:var(--ink);font-weight:600}
+main{display:grid;grid-template-columns:1.12fr .88fr;gap:18px;padding:18px 24px 44px;align-items:start}
+@media(max-width:960px){main{grid-template-columns:1fr}}
+.panel{display:flex;flex-direction:column;min-height:0}
+.phead{display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--line)}
+.phead .ic{width:32px;height:32px;border-radius:.6rem;display:grid;place-items:center;font-size:15px}
+.phead h2{font-family:var(--disp);font-size:15px;margin:0;font-weight:700;letter-spacing:.01em}
+.phead .cnt{margin-left:auto;font-size:11px;color:var(--dim);font-family:var(--mono)}
+#stream{padding:16px 18px;display:flex;flex-direction:column;gap:11px;height:60vh;overflow-y:auto;scroll-behavior:smooth}
+#stream::-webkit-scrollbar,#grid::-webkit-scrollbar{width:8px}
+#stream::-webkit-scrollbar-thumb,#grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:8px}
+.ev{animation:slide .34s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.bubble{max-width:88%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.45}
+.who{font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;display:flex;align-items:center;gap:6px;opacity:.9}
+.ev-user{align-self:flex-end;text-align:right}
+.ev-user .bubble{background:color-mix(in srgb,var(--green) 20%,transparent);border:1px solid color-mix(in srgb,var(--green) 32%,transparent);border-bottom-right-radius:4px;text-align:left}
+.ev-user .who{color:#82e6ac;justify-content:flex-end}
+.ev-agent{align-self:flex-start}
+.ev-agent .bubble{background:rgba(255,255,255,.05);border:1px solid var(--line);border-bottom-left-radius:4px}
+.ev-agent .who{color:var(--p)}
+/* agent action row — client-legible */
+.act{align-self:stretch;display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:13px;
+background:color-mix(in srgb,var(--a) 6%,transparent);border:1px solid color-mix(in srgb,var(--a) 22%,transparent);
+animation:slide .34s cubic-bezier(.2,.8,.2,1) both,actflash 1.6s ease}
+@keyframes actflash{0%{background:color-mix(in srgb,var(--a) 20%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--a) 30%,transparent)}100%{background:color-mix(in srgb,var(--a) 6%,transparent);box-shadow:none}}
+.act .ai{width:34px;height:34px;border-radius:.6rem;display:grid;place-items:center;font-size:15px;background:color-mix(in srgb,var(--a) 16%,transparent);color:var(--a);flex-shrink:0}
+.act .lbl{font-weight:600;font-size:13.5px}
+.act .det{color:var(--muted);font-size:12px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act .tool{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:2px}
+.act .ok{margin-left:auto;flex-shrink:0;font-size:15px}
+.act .ok .g{color:var(--green)} .act .ok .r{color:var(--red)}
+/* thinking shimmer */
+.think{align-self:flex-start;display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);font-size:12.5px}
+.think .d{display:flex;gap:4px}.think .d i{width:6px;height:6px;border-radius:50%;background:var(--p);animation:blink 1.2s infinite}
+.think .d i:nth-child(2){animation-delay:.2s}.think .d i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.emit{align-self:stretch;display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:13px;border-left:3px solid var(--p);
+background:color-mix(in srgb,var(--p) 13%,transparent);font-size:13.5px;font-weight:600;animation:slide .34s ease both}
+.emit .ei{color:var(--p);font-size:16px} .emit .arrow{margin-left:auto;color:var(--p)}
+.divider{align-self:center;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;padding:6px 0}
+.ev-time{font-size:9.5px;color:var(--dim);margin-top:3px}
+.empty{text-align:center;color:var(--muted);padding:15vh 14px}
+.empty .big{font-size:46px;margin-bottom:14px;color:var(--p);opacity:.55}
+.empty .hint{font-size:13px;color:var(--dim);margin-top:8px}
+#grid{padding:16px 18px;display:flex;flex-direction:column;gap:13px;height:76vh;overflow-y:auto}
+.card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-left:4px solid var(--p);border-radius:13px;overflow:hidden;animation:slide .36s ease both}
+.card.flash{box-shadow:0 0 0 2px color-mix(in srgb,var(--p) 55%,transparent);animation:slide .36s ease both,unflash 5s ease forwards}
+@keyframes unflash{to{box-shadow:none}}
+.card.done{opacity:.42;filter:saturate(.5)}
+.chead{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+.tid{font-family:var(--disp);font-weight:700;font-size:17px}
+.badge{font-size:10px;font-weight:800;letter-spacing:.6px;padding:4px 8px;border-radius:6px;text-transform:uppercase}
+.b-pickup{background:rgba(245,165,36,.16);color:var(--pickup);border:1px solid rgba(245,165,36,.4)}
+.b-delivery{background:rgba(59,130,246,.16);color:var(--delivery);border:1px solid rgba(59,130,246,.4)}
+.b-dine_in{background:rgba(34,197,94,.16);color:var(--dine_in);border:1px solid rgba(34,197,94,.4)}
+.b-event{background:rgba(138,151,166,.16);color:#cbd5e1;border:1px solid var(--line)}
+.when{margin-left:auto;font-size:11.5px;color:var(--dim)}
+.cbody{padding:12px 15px}
+.line{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+.line:last-child{border-bottom:0}
+.qty{font-weight:800;color:#fff;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:6px;min-width:30px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.iname{font-weight:600}.mods{color:var(--muted);font-size:12px;margin-top:2px}
+.lt{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums;font-size:13px}
+.cfoot{display:flex;align-items:center;gap:12px;padding:12px 15px;border-top:1px solid var(--line);background:rgba(255,255,255,.03)}
+.total{font-family:var(--disp);font-size:21px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.total small{font-size:12px;color:var(--muted);font-weight:600;font-family:var(--mono)}
+.cust{font-size:12px;color:var(--muted);line-height:1.3}
+.bump{margin-left:auto;background:var(--p);color:#0a0b10;border:0;border-radius:8px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+.bump:hover{filter:brightness(1.08)}
+.kv{font-size:13px;line-height:1.65}.kv b{color:#fff}
+.note{margin-top:8px;font-size:12px;color:#fcd34d}
+.skel{color:transparent!important;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.2),rgba(255,255,255,.08));background-size:200% 100%;animation:shimmer 1.3s linear infinite;border-radius:6px;min-width:40px;display:inline-block;height:.9em;vertical-align:middle}
+@keyframes shimmer{to{background-position:-200% 0}}
+.stat b.nostat{font-size:11.5px;color:var(--muted);font-weight:600;font-family:-apple-system,sans-serif;line-height:1.7}
+.brand h1.skel{min-width:190px;height:1em;border-radius:8px}
+.brand h1.bizerr{color:var(--muted);font-weight:600;font-size:16px}
+.composer{border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:9px;background:rgba(255,255,255,.02)}
+.quick{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.qchip{font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer;transition:.15s}
+.qchip:hover{border-color:var(--p);color:var(--ink)}
+.crow{display:flex;gap:9px}
+.crow input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:.75rem;padding:12px 14px;color:var(--ink);font-size:14px;outline:none}
+.crow input:focus{border-color:var(--p)}
+.crow input::placeholder{color:var(--dim)}
+.crow button{background:var(--p);color:#0a0b10;border:0;border-radius:.75rem;padding:0 18px;font-size:16px;cursor:pointer;display:grid;place-items:center;min-width:52px}
+.crow button:disabled{opacity:.5;cursor:default}
 </style>
 </head>
 <body>
-  <header>
-    <div class="logo" id="logo"><i class="fas fa-utensils"></i></div>
-    <div class="brand"><h1 id="bizname">Asistente de Pedidos</h1>
-      <div class="sub"><span class="aipill"><i class="fas fa-robot"></i> <span id="aipill">Asistente IA en vivo</span></span> <span id="bizsub"></span></div></div>
-    <span class="pill"><span class="dot" id="dot"></span><span id="connlabel"></span></span>
-    <div class="spacer"></div>
-    <div class="stats">
-      <div class="stat"><b id="s-tickets" class="skel">·</b><span id="l-tickets"></span></div>
-      <div class="stat"><b id="s-tools" class="skel">·</b><span id="l-tools"></span></div>
-      <div class="stat"><b id="s-sales" class="skel">·</b><span id="l-sales"></span></div>
-    </div>
-    <div class="lang" id="lang"><button data-lang="es">ES</button><button data-lang="en">EN</button></div>
-    <button class="btn" id="sound"></button>
-  </header>
-  <div class="legend">
-    <span><i class="fas fa-brain txt-p"></i> <b id="lg-a"></b> <span id="lg-a2"></span></span>
-    <span><i class="fas fa-receipt txt-p"></i> <b id="lg-b"></b> <span id="lg-b2"></span></span>
-  </div>
+<header>
+<div class="logo" id="logo"><i class="fas fa-utensils"></i></div>
+<div class="brand"><h1 id="bizname" class="skel"></h1>
+<div class="sub"><span class="aipill"><i class="fas fa-robot"></i> <span id="aipill">Asistente IA en vivo</span></span> <span id="bizsub"></span></div></div>
+<span class="pill"><span class="dot" id="dot"></span><span id="connlabel"></span></span>
+<div class="spacer"></div>
+<div class="stats">
+<div class="stat"><b id="s-tickets" class="skel">·</b><span id="l-tickets"></span></div>
+<div class="stat"><b id="s-tools" class="skel">·</b><span id="l-tools"></span></div>
+<div class="stat"><b id="s-sales" class="skel">·</b><span id="l-sales"></span></div>
+</div>
+<div class="lang" id="lang"><button data-lang="es">ES</button><button data-lang="en">EN</button></div>
+<button class="btn" id="sound"></button>
+</header>
+<div class="legend">
+<span><i class="fas fa-brain txt-p"></i> <b id="lg-a"></b> <span id="lg-a2"></span></span>
+<span><i class="fas fa-receipt txt-p"></i> <b id="lg-b"></b> <span id="lg-b2"></span></span>
+</div>
 
-  <main>
-    <section class="panel glass">
-      <div class="phead"><div class="ic tint"><i class="fas fa-robot"></i></div><h2 id="p-agent"></h2>
-        <span class="pill" style="padding:4px 10px"><span class="dot live"></span><span id="agentlive"></span></span>
-        <span class="cnt" id="streamcnt"></span></div>
-      <div id="stream"></div>
-      <div class="composer">
-        <div class="quick" id="quick"></div>
-        <form class="crow" id="composer">
-          <input id="msg" autocomplete="off" />
-          <button type="submit" id="send" title="Enviar"><i class="fas fa-paper-plane"></i></button>
-        </form>
-      </div>
-    </section>
-    <section class="panel glass">
-      <div class="phead"><div class="ic tint"><i class="fas fa-receipt"></i></div><h2 id="p-board"></h2><span class="cnt" id="gridcnt"></span></div>
-      <div id="grid"></div>
-    </section>
-  </main>
+<main>
+<section class="panel glass">
+<div class="phead"><div class="ic tint"><i class="fas fa-robot"></i></div><h2 id="p-agent"></h2>
+<span class="pill" style="padding:4px 10px"><span class="dot live"></span><span id="agentlive"></span></span>
+<span class="cnt" id="streamcnt"></span></div>
+<div id="stream"></div>
+<div class="composer">
+<div class="quick" id="quick"></div>
+<form class="crow" id="composer">
+<input id="msg" autocomplete="off" />
+<button type="submit" id="send" title="Enviar"><i class="fas fa-paper-plane"></i></button>
+</form>
+</div>
+</section>
+<section class="panel glass">
+<div class="phead"><div class="ic tint"><i class="fas fa-receipt"></i></div><h2 id="p-board"></h2><span class="cnt" id="gridcnt"></span></div>
+<div id="grid"></div>
+</section>
+</main>
 
 <script>
 (() => {
-  const $ = (id) => document.getElementById(id);
-  const stream = $("stream"), grid = $("grid");
+const $ = (id) => document.getElementById(id);
+const stream = $("stream"), grid = $("grid");
 
-  const I18N = {
-    es:{connecting:"conectando…",live:"en vivo",reconnecting:"reconectando…",offline:"sin conexión",
-      tickets:"pedidos",tools:"acciones IA",sales:"ventas",e_tickets:"Sin pedidos",e_tools:"Sin actividad",e_sales:"—",sound_on:"Sonido",sound_off:"Sonido",
-      p_agent:"El agente, en tiempo real",p_board:"Pedidos listos · Cocina",agentlive:"razonando en vivo",aipill:"Asistente de Pedidos",
-      lg_a:"Izquierda:",lg_a2:"el agente razona y actúa en vivo",lg_b:"Derecha:",lg_b2:"los pedidos que genera, listos para cocina",
-      empty_agent:"Listo y esperando.",empty_hint:"Envía un mensaje por WhatsApp y míralo atender en vivo.",empty_board:"Aún no hay pedidos.",
-      customer:"Cliente",agent:"Agente",thinking:"El agente está pensando…",channel:"canal",bump:"Listo ✓",ph:"Escribe un mensaje, como en WhatsApp…",sending:"enviando…",try:"Pruébalo:",
-      emit_ticket:"Pedido enviado a cocina",emit_reservation:"Reservación creada",emit_viewing:"Visita agendada",emit_lead:"Prospecto calificado",emit_handoff:"Transferido a un asesor",reset:"— nueva conversación —",
-      svc_pickup:"Para llevar",svc_delivery:"Entrega",svc_dine_in:"En sitio",
-      t_reservation:"Reservación",t_viewing:"Visita",t_lead:"Prospecto",t_handoff:"A humano",
-      k_table:"Mesa",k_people:"personas",k_when:"Cuándo",k_name:"Nombre",k_tel:"Tel",k_folio:"Folio",
-      k_property:"Propiedad",k_zone:"Zona",k_operation:"Operación",k_budget:"Presupuesto",k_quality:"Calidad",k_reason:"Motivo",k_summary:"Resumen"},
-    en:{connecting:"connecting…",live:"live",reconnecting:"reconnecting…",offline:"offline",
-      tickets:"orders",tools:"AI actions",sales:"sales",e_tickets:"No orders yet",e_tools:"No activity",e_sales:"—",sound_on:"Sound",sound_off:"Sound",
-      p_agent:"The agent, in real time",p_board:"Orders ready · Kitchen",agentlive:"reasoning live",aipill:"Order Assistant",
-      lg_a:"Left:",lg_a2:"the agent reasons and acts live",lg_b:"Right:",lg_b2:"the orders it produces, ready for the kitchen",
-      empty_agent:"Ready and waiting.",empty_hint:"Send a WhatsApp message and watch it work live.",empty_board:"No orders yet.",
-      customer:"Customer",agent:"Agent",thinking:"The agent is thinking…",channel:"channel",bump:"Done ✓",ph:"Type a message, like on WhatsApp…",sending:"sending…",try:"Try it:",
-      emit_ticket:"Order sent to kitchen",emit_reservation:"Reservation created",emit_viewing:"Viewing booked",emit_lead:"Lead qualified",emit_handoff:"Handed to an advisor",reset:"— new conversation —",
-      svc_pickup:"Takeout",svc_delivery:"Delivery",svc_dine_in:"Dine-in",
-      t_reservation:"Reservation",t_viewing:"Viewing",t_lead:"Lead",t_handoff:"To human",
-      k_table:"Table",k_people:"people",k_when:"When",k_name:"Name",k_tel:"Phone",k_folio:"Ref",
-      k_property:"Property",k_zone:"Zone",k_operation:"Operation",k_budget:"Budget",k_quality:"Quality",k_reason:"Reason",k_summary:"Summary"}
-  };
-  // human-readable agent action per tool: [icon, es, en]
-  const ACT = {
-    get_menu:["fa-book-open","Consultó el menú","Checked the menu"],
-    add_to_order:["fa-cart-plus","Armó el pedido","Built the order"],
-    create_order:["fa-file-invoice","Cerró el pedido","Closed the order"],
-    emit_ticket:["fa-receipt","Envió el ticket a cocina","Sent the ticket to the kitchen"],
-    book_table:["fa-calendar-check","Reservó una mesa","Booked a table"],
-    handoff_human:["fa-headset","Pasó a un asesor","Handed to an advisor"],
-    get_listings:["fa-city","Buscó propiedades","Searched listings"],
-    schedule_viewing:["fa-calendar-day","Agendó una visita","Scheduled a viewing"],
-    qualify_lead:["fa-user-check","Calificó al prospecto","Qualified the lead"]
-  };
-  let LANG = (localStorage.getItem("ui_lang")==="en")?"en":"es";
-  const t = (k)=> (I18N[LANG][k] ?? k);
-  const actLabel = (tool)=> ACT[tool] ? (LANG==="en"?ACT[tool][2]:ACT[tool][1]) : tool;
+const I18N = {
+es:{connecting:"conectando…",live:"en vivo",reconnecting:"reconectando…",offline:"sin conexión",
+tickets:"pedidos",tools:"acciones IA",sales:"ventas",e_tickets:"Sin pedidos",e_tools:"Sin actividad",e_sales:"Sin ventas",sound_on:"Sonido",sound_off:"Sonido",
+p_agent:"El agente, en tiempo real",p_board:"Pedidos listos · Cocina",agentlive:"razonando en vivo",aipill:"Asistente de Pedidos",
+lg_a:"Izquierda:",lg_a2:"el agente razona y actúa en vivo",lg_b:"Derecha:",lg_b2:"los pedidos que genera, listos para cocina",
+empty_agent:"Listo y esperando.",empty_hint:"Envía un mensaje por WhatsApp y míralo atender en vivo.",empty_board:"Aún no hay pedidos.",
+customer:"Cliente",agent:"Agente",thinking:"El agente está pensando…",channel:"canal",bump:"Listo ✓",ph:"Escribe un mensaje, como en WhatsApp…",sending:"enviando…",try:"Pruébalo:",
+emit_ticket:"Pedido enviado a cocina",emit_reservation:"Reservación creada",emit_viewing:"Visita agendada",emit_lead:"Prospecto calificado",emit_handoff:"Transferido a un asesor",reset:"— nueva conversación —",
+svc_pickup:"Para llevar",svc_delivery:"Entrega",svc_dine_in:"En sitio",
+t_reservation:"Reservación",t_viewing:"Visita",t_lead:"Prospecto",t_handoff:"A humano",
+k_table:"Mesa",k_people:"personas",k_when:"Cuándo",k_name:"Nombre",k_tel:"Tel",k_folio:"Folio",
+k_property:"Propiedad",k_zone:"Zona",k_operation:"Operación",k_budget:"Presupuesto",k_quality:"Calidad",k_reason:"Motivo",k_summary:"Resumen",
+biz_loading:"Cargando negocio…",biz_unknown:"Negocio no identificado",biz_error:"No se pudo cargar el negocio"},
+en:{connecting:"connecting…",live:"live",reconnecting:"reconnecting…",offline:"offline",
+tickets:"orders",tools:"AI actions",sales:"sales",e_tickets:"No orders yet",e_tools:"No activity",e_sales:"No sales yet",sound_on:"Sound",sound_off:"Sound",
+p_agent:"The agent, in real time",p_board:"Orders ready · Kitchen",agentlive:"reasoning live",aipill:"Order Assistant",
+lg_a:"Left:",lg_a2:"the agent reasons and acts live",lg_b:"Right:",lg_b2:"the orders it produces, ready for the kitchen",
+empty_agent:"Ready and waiting.",empty_hint:"Send a WhatsApp message and watch it work live.",empty_board:"No orders yet.",
+customer:"Customer",agent:"Agent",thinking:"The agent is thinking…",channel:"channel",bump:"Done ✓",ph:"Type a message, like on WhatsApp…",sending:"sending…",try:"Try it:",
+emit_ticket:"Order sent to kitchen",emit_reservation:"Reservation created",emit_viewing:"Viewing booked",emit_lead:"Lead qualified",emit_handoff:"Handed to an advisor",reset:"— new conversation —",
+svc_pickup:"Takeout",svc_delivery:"Delivery",svc_dine_in:"Dine-in",
+t_reservation:"Reservation",t_viewing:"Viewing",t_lead:"Lead",t_handoff:"To human",
+k_table:"Table",k_people:"people",k_when:"When",k_name:"Name",k_tel:"Phone",k_folio:"Ref",
+k_property:"Property",k_zone:"Zone",k_operation:"Operation",k_budget:"Budget",k_quality:"Quality",k_reason:"Reason",k_summary:"Summary",
+biz_loading:"Loading business…",biz_unknown:"Business not identified",biz_error:"Couldn't load business"}
+};
+// human-readable agent action per tool: [icon, es, en]
+const ACT = {
+get_menu:["fa-book-open","Consultó el menú","Checked the menu"],
+add_to_order:["fa-cart-plus","Armó el pedido","Built the order"],
+create_order:["fa-file-invoice","Cerró el pedido","Closed the order"],
+emit_ticket:["fa-receipt","Envió el ticket a cocina","Sent the ticket to the kitchen"],
+book_table:["fa-calendar-check","Reservó una mesa","Booked a table"],
+handoff_human:["fa-headset","Pasó a un asesor","Handed to an advisor"],
+get_listings:["fa-city","Buscó propiedades","Searched listings"],
+schedule_viewing:["fa-calendar-day","Agendó una visita","Scheduled a viewing"],
+qualify_lead:["fa-user-check","Calificó al prospecto","Qualified the lead"]
+};
+let LANG = (localStorage.getItem("ui_lang")==="en")?"en":"es";
+const t = (k)=> (I18N[LANG][k] ?? k);
+const actLabel = (tool)=> ACT[tool] ? (LANG==="en"?ACT[tool][2]:ACT[tool][1]) : tool;
 
-  let soundOn=false, audio=null, connState="connecting";
-  let tickets=0, toolcalls=0, sales=0, currency="MXN", cfg={};
-  const STREAM=[], CARDS=[];
-  let thinkEl=null;
+let soundOn=false, audio=null, connState="connecting";
+let tickets=0, toolcalls=0, sales=0, currency="MXN", cfg={};
+const STREAM=[], CARDS=[];
+let thinkEl=null;
+let bizState="loading"; // "loading" | "ok" | "unknown" | "error" — drives the header brand name
 
-  const fmt=(n)=>"$"+Number(n||0).toLocaleString(LANG==="en"?"en-US":"es-MX");
-  const timeStr=(ms)=>new Date(ms||Date.now()).toLocaleTimeString(LANG==="en"?"en-US":"es-MX",{hour:"2-digit",minute:"2-digit"});
-  const esc=(s)=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const kv=(k,v)=> v!==undefined&&v!==null&&v!==""?`<div><b>${k}:</b> ${esc(String(v))}</div>`:"";
+const fmt=(n)=>"$"+Number(n||0).toLocaleString(LANG==="en"?"en-US":"es-MX");
+const timeStr=(ms)=>new Date(ms||Date.now()).toLocaleTimeString(LANG==="en"?"en-US":"es-MX",{hour:"2-digit",minute:"2-digit"});
+const esc=(s)=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const kv=(k,v)=> v!==undefined&&v!==null&&v!==""?`<div><b>${k}:</b> ${esc(String(v))}</div>`:"";
 
-  function detail(tool,i){
-    try{ i=i||{};
-      if(tool==="add_to_order"&&Array.isArray(i.items)) return i.items.map(x=>`${x.qty||1}× ${x.item}`).join(" · ");
-      if(tool==="get_menu") return [i.categoria,i.q].filter(Boolean).join(" ")||(LANG==="en"?"full menu":"menú completo");
-      if(tool==="create_order") return [i.type&&t("svc_"+i.type),i.time].filter(Boolean).join(" · ");
-      if(tool==="book_table") return [i.size&&i.size+"p",i.datetime,i.name].filter(Boolean).join(" · ");
-      if(tool==="get_listings") return [i.operacion,i.zona,i.recamaras&&i.recamaras+" rec",i.presupuesto_max&&"≤"+fmt(i.presupuesto_max)].filter(Boolean).join(" · ")||(LANG==="en"?"all listings":"todo el inventario");
-      if(tool==="schedule_viewing") return [i.listing_id,i.datetime,i.name].filter(Boolean).join(" · ");
-      if(tool==="qualify_lead") return [i.name,i.operacion,i.presupuesto_max&&fmt(i.presupuesto_max),i.zona].filter(Boolean).join(" · ");
-      if(tool==="handoff_human") return i.reason||"";
-      return "";
-    }catch{return""}
-  }
+function detail(tool,i){
+try{ i=i||{};
+if(tool==="add_to_order"&&Array.isArray(i.items)) return i.items.map(x=>`${x.qty||1}× ${x.item}`).join(" · ");
+if(tool==="get_menu") return [i.categoria,i.q].filter(Boolean).join(" ")||(LANG==="en"?"full menu":"menú completo");
+if(tool==="create_order") return [i.type&&t("svc_"+i.type),i.time].filter(Boolean).join(" · ");
+if(tool==="book_table") return [i.size&&i.size+"p",i.datetime,i.name].filter(Boolean).join(" · ");
+if(tool==="get_listings") return [i.operacion,i.zona,i.recamaras&&i.recamaras+" rec",i.presupuesto_max&&"≤"+fmt(i.presupuesto_max)].filter(Boolean).join(" · ")||(LANG==="en"?"all listings":"todo el inventario");
+if(tool==="schedule_viewing") return [i.listing_id,i.datetime,i.name].filter(Boolean).join(" · ");
+if(tool==="qualify_lead") return [i.name,i.operacion,i.presupuesto_max&&fmt(i.presupuesto_max),i.zona].filter(Boolean).join(" · ");
+if(tool==="handoff_human") return i.reason||"";
+return "";
+}catch{return""}
+}
 
-  function applyStatic(){
-    $("connlabel").textContent=t(connState);
-    $("l-tickets").textContent=t("tickets"); $("l-tools").textContent=t("tools"); $("l-sales").textContent=t("sales");
-    $("sound").innerHTML=(soundOn?'<i class="fas fa-bell"></i> ':'<i class="fas fa-bell-slash"></i> ')+t("sound_"+(soundOn?"on":"off"));
-    $("p-agent").textContent=t("p_agent"); $("p-board").textContent=t("p_board"); $("agentlive").textContent=t("agentlive"); $("aipill").textContent=t("aipill");
-    $("lg-a").textContent=t("lg_a"); $("lg-a2").textContent=t("lg_a2"); $("lg-b").textContent=t("lg_b"); $("lg-b2").textContent=t("lg_b2");
-    $("bizsub").textContent="· "+(cfg.industry||"")+" · "+t("channel")+" "+(cfg.channel||"");
-    [...$("lang").children].forEach(b=>b.classList.toggle("on",b.dataset.lang===LANG));
-    document.documentElement.lang=LANG==="en"?"en":"es-MX";
-  }
-  function setConn(s){connState=s;$("dot").className="dot"+(s==="live"?" live":"");$("connlabel").textContent=t(s);}
-  const EMPTY_STAT={"s-tickets":"e_tickets","s-tools":"e_tools","s-sales":"e_sales"};
-  function setStat(id,val){const el=$(id);if(!el)return;el.classList.remove("skel");if(val>0){el.classList.remove("nostat");el.textContent=id==="s-sales"?fmt(val):String(val);}else{el.classList.add("nostat");el.textContent=t(EMPTY_STAT[id]);}}
-  function settleStats(){setStat("s-tickets",tickets);setStat("s-tools",toolcalls);setStat("s-sales",sales);}
+// Renders the header brand name for the current bizState — never leaves a
+// static/generic name sitting there as if it were the resolved business.
+function renderBizName(){
+const el=$("bizname");
+el.classList.remove("skel","bizerr");
+if(bizState==="loading"){ el.classList.add("skel"); el.textContent=t("biz_loading"); return; }
+if(bizState==="ok"){ el.textContent=cfg.business_name || t("biz_unknown"); return; }
+if(bizState==="unknown"){ el.classList.add("bizerr"); el.textContent=t("biz_unknown"); return; }
+el.classList.add("bizerr"); el.textContent=t("biz_error");
+}
 
-  const QBIZ=new URLSearchParams(location.search).get("business");
-  let FILTER_BIZ=null;
-  fetch("/config"+(QBIZ?"?business="+encodeURIComponent(QBIZ):"")).then(r=>r.json()).then(c=>{
-    cfg=c||{}; if(QBIZ) FILTER_BIZ=c.business_name||null;
-    if(c.branding&&c.branding.color) document.documentElement.style.setProperty("--p",c.branding.color);
-    $("logo").textContent=(c.branding&&c.branding.emoji)||"🍽️";
-    $("bizname").textContent=c.business_name||"Asistente de Pedidos";
-    document.title=(c.business_name||"Asistente de Pedidos")+" · en vivo";
-    currency=c.currency||"MXN"; applyStatic(); renderAll(); renderComposer();
-  }).catch(()=>{applyStatic();renderAll();renderComposer();});
+function applyStatic(){
+$("connlabel").textContent=t(connState);
+$("l-tickets").textContent=t("tickets"); $("l-tools").textContent=t("tools"); $("l-sales").textContent=t("sales");
+$("sound").innerHTML=(soundOn?'<i class="fas fa-bell"></i> ':'<i class="fas fa-bell-slash"></i> ')+t("sound_"+(soundOn?"on":"off"));
+$("p-agent").textContent=t("p_agent"); $("p-board").textContent=t("p_board"); $("agentlive").textContent=t("agentlive"); $("aipill").textContent=t("aipill");
+$("lg-a").textContent=t("lg_a"); $("lg-a2").textContent=t("lg_a2"); $("lg-b").textContent=t("lg_b"); $("lg-b2").textContent=t("lg_b2");
+$("bizsub").textContent=cfg.industry?("· "+cfg.industry+" · "+t("channel")+" "+(cfg.channel||"")):"";
+renderBizName();
+[...$("lang").children].forEach(b=>b.classList.toggle("on",b.dataset.lang===LANG));
+document.documentElement.lang=LANG==="en"?"en":"es-MX";
+}
+function setConn(s){connState=s;$("dot").className="dot"+(s==="live"?" live":"");$("connlabel").textContent=t(s);}
+const EMPTY_STAT={"s-tickets":"e_tickets","s-tools":"e_tools","s-sales":"e_sales"};
+function setStat(id,val){const el=$(id);if(!el)return;el.classList.remove("skel");if(val>0){el.classList.remove("nostat");el.textContent=id==="s-sales"?fmt(val):String(val);}else{el.classList.add("nostat");el.textContent=t(EMPTY_STAT[id]);}}
+function settleStats(){setStat("s-tickets",tickets);setStat("s-tools",toolcalls);setStat("s-sales",sales);}
 
-  $("sound").onclick=()=>{soundOn=!soundOn;applyStatic();if(soundOn&&!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(soundOn&&audio&&audio.state==="suspended")audio.resume();};
-  function ding(kind){if(!soundOn||!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.type="sine";
-    o.frequency.value=kind==="ticket"?880:kind==="tool"?520:660;const v=kind==="tool"?0.05:0.22;
-    g.gain.setValueAtTime(0.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(v,audio.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.0001,audio.currentTime+0.3);
-    o.start();o.stop(audio.currentTime+0.32);
-    if(kind==="ticket"){const o2=audio.createOscillator();o2.connect(g);o2.type="sine";o2.frequency.setValueAtTime(1320,audio.currentTime+0.11);o2.start(audio.currentTime+0.11);o2.stop(audio.currentTime+0.33);}}
+const QBIZ=new URLSearchParams(location.search).get("business");
+let FILTER_BIZ=null;
+fetch("/config"+(QBIZ?"?business="+encodeURIComponent(QBIZ):"")).then(r=>{
+if(!r.ok) throw new Error("config http "+r.status);
+return r.json();
+}).then(c=>{
+cfg=c||{}; if(QBIZ) FILTER_BIZ=c.business_name||null;
+if(c.branding&&c.branding.color) document.documentElement.style.setProperty("--p",c.branding.color);
+$("logo").textContent=(c.branding&&c.branding.emoji)||"🍽️";
+bizState = c.business_name ? "ok" : "unknown";
+document.title=(c.business_name||t("biz_unknown"))+" · en vivo";
+currency=c.currency||"MXN"; applyStatic(); renderAll(); renderComposer();
+}).catch(()=>{ bizState="error"; applyStatic();renderAll();renderComposer(); });
 
-  $("lang").addEventListener("click",(ev)=>{const b=ev.target.closest("button");if(!b||b.dataset.lang===LANG)return;LANG=b.dataset.lang;localStorage.setItem("ui_lang",LANG);applyStatic();settleStats();renderAll();renderComposer();});
+$("sound").onclick=()=>{soundOn=!soundOn;applyStatic();if(soundOn&&!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(soundOn&&audio&&audio.state==="suspended")audio.resume();};
+function ding(kind){if(!soundOn||!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.type="sine";
+o.frequency.value=kind==="ticket"?880:kind==="tool"?520:660;const v=kind==="tool"?0.05:0.22;
+g.gain.setValueAtTime(0.0001,audio.currentTime);g.gain.exponentialRampToValueAtTime(v,audio.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.0001,audio.currentTime+0.3);
+o.start();o.stop(audio.currentTime+0.32);
+if(kind==="ticket"){const o2=audio.createOscillator();o2.connect(g);o2.type="sine";o2.frequency.setValueAtTime(1320,audio.currentTime+0.11);o2.start(audio.currentTime+0.11);o2.stop(audio.currentTime+0.33);}}
 
-  function clearThink(){ if(thinkEl){thinkEl.remove();thinkEl=null;} }
-  function showThink(){ clearThink(); const d=document.createElement("div"); d.className="think ev"; d.innerHTML=`<i class="fas fa-robot txt-p"></i> ${esc(t("thinking"))} <span class="d"><i></i><i></i><i></i></span>`; stream.appendChild(d); thinkEl=d; stream.scrollTop=stream.scrollHeight; }
+$("lang").addEventListener("click",(ev)=>{const b=ev.target.closest("button");if(!b||b.dataset.lang===LANG)return;LANG=b.dataset.lang;localStorage.setItem("ui_lang",LANG);applyStatic();settleStats();renderAll();renderComposer();});
 
-  function streamNode(e){
-    const {kind,payload:p,at}=e; const d=document.createElement("div"); d.className="ev";
-    if(kind==="agent_turn"){d.classList.add("ev-user");d.innerHTML=`<div class="who">${esc(t("customer"))} <i class="fas fa-user"></i></div><div class="bubble">${esc(p.text||"")}</div><div class="ev-time">${timeStr(at)}</div>`;}
-    else if(kind==="agent_say"){d.classList.add("ev-agent");d.innerHTML=`<div class="who"><i class="fas fa-robot"></i> ${esc(t("agent"))}</div><div class="bubble">${esc(p.text||"").replace(/\n/g,"<br>")}</div>`;}
-    else if(kind==="tool_call"){const A=ACT[p.tool]||["fa-screwdriver-wrench"];const okI=p.ok?'<span class="g"><i class="fas fa-circle-check"></i></span>':'<span class="r"><i class="fas fa-circle-xmark"></i></span>';const det=detail(p.tool,p.input);
-      d.classList.add("act");d.innerHTML=`<div class="ai"><i class="fas ${A[0]}"></i></div><div style="min-width:0;flex:1"><div class="lbl">${esc(actLabel(p.tool))}</div>${det?`<div class="det">${esc(det)}</div>`:""}<div class="tool">${esc(p.tool)}()</div></div><div class="ok">${okI}</div>`;}
-    else if(kind==="emit"){d.classList.add("emit");d.innerHTML=`<i class="fas ${p.icon} ei"></i> <span>${esc(p.label)}${p.ref?" · <b>"+esc(p.ref)+"</b>":""}${p.total?" · "+fmt(p.total):""}</span><span class="arrow"><i class="fas fa-arrow-right"></i></span>`;}
-    else if(kind==="reset"){d.classList.add("divider");d.textContent=t("reset");}
-    return d;
-  }
-  function pushStream(e,think){
-    clearThink();
-    STREAM.push(e); if(STREAM.length>80)STREAM.shift();
-    if(stream.querySelector(".empty"))stream.innerHTML="";
-    stream.appendChild(streamNode(e));
-    while(stream.children.length>82)stream.removeChild(stream.firstChild);
-    $("streamcnt").textContent=STREAM.filter(x=>x.kind==="tool_call").length||"";
-    if(think)showThink();
-    stream.scrollTop=stream.scrollHeight;
-  }
+function clearThink(){ if(thinkEl){thinkEl.remove();thinkEl=null;} }
+function showThink(){ clearThink(); const d=document.createElement("div"); d.className="think ev"; d.innerHTML=`<i class="fas fa-robot txt-p"></i> ${esc(t("thinking"))} <span class="d"><i></i><i></i><i></i></span>`; stream.appendChild(d); thinkEl=d; stream.scrollTop=stream.scrollHeight; }
 
-  function ticketNode(t0,flash){
-    const svc=(t0.service&&t0.service.type)||"pickup";const card=document.createElement("div");card.className="card"+(flash?" flash":"");
-    card.innerHTML=`<div class="chead"><span class="tid">${esc(t0.ticket_id||"—")}</span><span class="badge b-${svc}">${t("svc_"+svc)}${t0.service&&t0.service.time?" · "+esc(t0.service.time):""}</span><span class="when">${timeStr(Date.now())}</span></div>
-      <div class="cbody">${(t0.items||[]).map(i=>`<div class="line"><div class="qty">${i.qty}×</div><div><div class="iname">${esc(i.name)}</div>${(i.mods&&i.mods.length)?`<div class="mods">${i.mods.map(esc).join(" · ")}</div>`:""}</div><div class="lt">${fmt(i.line_total)}</div></div>`).join("")}
-        ${t0.service&&t0.service.address?`<div class="note"><i class="fas fa-location-dot"></i> ${esc(t0.service.address)}</div>`:""}${t0.notes?`<div class="note"><i class="fas fa-pen"></i> ${esc(t0.notes)}</div>`:""}</div>
-      <div class="cfoot"><div class="total">${fmt(t0.total)} <small>${esc(t0.currency||currency)}</small></div><div class="cust">${t0.customer&&t0.customer.name?esc(t0.customer.name)+"<br>":""}${t0.customer&&t0.customer.phone?esc(t0.customer.phone):""}</div><button class="bump">${t("bump")}</button></div>`;
-    card.querySelector(".bump").onclick=()=>card.classList.toggle("done");return card;
-  }
-  function eventNode(kind,p,flash){
-    const icons={reservation:"fa-calendar-check",viewing:"fa-house",lead:"fa-user-check",handoff:"fa-headset"};
-    let rows="";
-    if(kind==="reservation")rows=kv(t("k_table"),(p.size!=null?p.size+" "+t("k_people"):""))+kv(t("k_when"),p.datetime)+kv(t("k_name"),p.name)+kv(t("k_tel"),p.tel)+kv(t("k_folio"),p.id);
-    else if(kind==="viewing")rows=kv(t("k_property"),p.titulo_es||p.listing_id)+kv(t("k_zone"),p.zona)+kv(t("k_when"),p.datetime)+kv(t("k_name"),p.name)+kv(t("k_tel"),p.tel)+kv(t("k_folio"),p.id);
-    else if(kind==="lead")rows=kv(t("k_name"),p.name)+kv(t("k_operation"),p.operacion)+kv(t("k_budget"),p.presupuesto_max?fmt(p.presupuesto_max):"—")+kv(t("k_zone"),p.zona||"—")+kv(t("k_quality"),(p.tier||"").toUpperCase());
-    else rows=kv(t("k_reason"),p.reason)+kv(t("k_summary"),p.summary);
-    const card=document.createElement("div");card.className="card"+(flash?" flash":"");card.style.borderLeftColor="#8a97a6";
-    card.innerHTML=`<div class="chead"><span class="tid"><i class="fas ${icons[kind]||"fa-bell"}"></i> ${esc(p.id||"")}</span><span class="badge b-event">${t("t_"+kind)}</span><span class="when">${timeStr(Date.now())}</span></div><div class="cbody"><div class="kv">${rows}</div></div>`;
-    return card;
-  }
-  function cardNode(type,p,flash){return type==="ticket"?ticketNode(p,flash):eventNode(type,p,flash);}
-  function pushCard(type,p){ if(grid.querySelector(".empty"))grid.innerHTML=""; CARDS.unshift({type,payload:p}); grid.insertBefore(cardNode(type,p,true),grid.firstChild); $("gridcnt").textContent=CARDS.length; }
+function streamNode(e){
+const {kind,payload:p,at}=e; const d=document.createElement("div"); d.className="ev";
+if(kind==="agent_turn"){d.classList.add("ev-user");d.innerHTML=`<div class="who">${esc(t("customer"))} <i class="fas fa-user"></i></div><div class="bubble">${esc(p.text||"")}</div><div class="ev-time">${timeStr(at)}</div>`;}
+else if(kind==="agent_say"){d.classList.add("ev-agent");d.innerHTML=`<div class="who"><i class="fas fa-robot"></i> ${esc(t("agent"))}</div><div class="bubble">${esc(p.text||"").replace(/\n/g,"<br>")}</div>`;}
+else if(kind==="tool_call"){const A=ACT[p.tool]||["fa-screwdriver-wrench"];const okI=p.ok?'<span class="g"><i class="fas fa-circle-check"></i></span>':'<span class="r"><i class="fas fa-circle-xmark"></i></span>';const det=detail(p.tool,p.input);
+d.classList.add("act");d.innerHTML=`<div class="ai"><i class="fas ${A[0]}"></i></div><div style="min-width:0;flex:1"><div class="lbl">${esc(actLabel(p.tool))}</div>${det?`<div class="det">${esc(det)}</div>`:""}<div class="tool">${esc(p.tool)}()</div></div><div class="ok">${okI}</div>`;}
+else if(kind==="emit"){d.classList.add("emit");d.innerHTML=`<i class="fas ${p.icon} ei"></i> <span>${esc(p.label)}${p.ref?" · <b>"+esc(p.ref)+"</b>":""}${p.total?" · "+fmt(p.total):""}</span><span class="arrow"><i class="fas fa-arrow-right"></i></span>`;}
+else if(kind==="reset"){d.classList.add("divider");d.textContent=t("reset");}
+return d;
+}
+function pushStream(e,think){
+clearThink();
+STREAM.push(e); if(STREAM.length>80)STREAM.shift();
+if(stream.querySelector(".empty"))stream.innerHTML="";
+stream.appendChild(streamNode(e));
+while(stream.children.length>82)stream.removeChild(stream.firstChild);
+$("streamcnt").textContent=STREAM.filter(x=>x.kind==="tool_call").length||"";
+if(think)showThink();
+stream.scrollTop=stream.scrollHeight;
+}
 
-  function renderAll(){
-    stream.innerHTML=""; grid.innerHTML=""; thinkEl=null;
-    if(!STREAM.length)stream.innerHTML=`<div class="empty"><div class="big"><i class="fas fa-robot"></i></div><div class="disp" style="font-size:16px">${t("empty_agent")}</div><div class="hint">${t("empty_hint")}</div></div>`;
-    else{STREAM.forEach(e=>stream.appendChild(streamNode(e)));stream.scrollTop=stream.scrollHeight;}
-    if(!CARDS.length)grid.innerHTML=`<div class="empty"><div class="big">${(cfg.branding&&cfg.branding.emoji)||"🍽️"}</div><div>${t("empty_board")}</div></div>`;
-    else CARDS.forEach(c=>grid.appendChild(cardNode(c.type,c.payload,false)));
-    $("streamcnt").textContent=STREAM.filter(x=>x.kind==="tool_call").length||""; $("gridcnt").textContent=CARDS.length||"";
-  }
+function ticketNode(t0,flash){
+const svc=(t0.service&&t0.service.type)||"pickup";const card=document.createElement("div");card.className="card"+(flash?" flash":"");
+card.innerHTML=`<div class="chead"><span class="tid">${esc(t0.ticket_id||"—")}</span><span class="badge b-${svc}">${t("svc_"+svc)}${t0.service&&t0.service.time?" · "+esc(t0.service.time):""}</span><span class="when">${timeStr(Date.now())}</span></div>
+<div class="cbody">${(t0.items||[]).map(i=>`<div class="line"><div class="qty">${i.qty}×</div><div><div class="iname">${esc(i.name)}</div>${(i.mods&&i.mods.length)?`<div class="mods">${i.mods.map(esc).join(" · ")}</div>`:""}</div><div class="lt">${fmt(i.line_total)}</div></div>`).join("")}
+${t0.service&&t0.service.address?`<div class="note"><i class="fas fa-location-dot"></i> ${esc(t0.service.address)}</div>`:""}${t0.notes?`<div class="note"><i class="fas fa-pen"></i> ${esc(t0.notes)}</div>`:""}</div>
+<div class="cfoot"><div class="total">${fmt(t0.total)} <small>${esc(t0.currency||currency)}</small></div><div class="cust">${t0.customer&&t0.customer.name?esc(t0.customer.name)+"<br>":""}${t0.customer&&t0.customer.phone?esc(t0.customer.phone):""}</div><button class="bump">${t("bump")}</button></div>`;
+card.querySelector(".bump").onclick=()=>card.classList.toggle("done");return card;
+}
+function eventNode(kind,p,flash){
+const icons={reservation:"fa-calendar-check",viewing:"fa-house",lead:"fa-user-check",handoff:"fa-headset"};
+let rows="";
+if(kind==="reservation")rows=kv(t("k_table"),(p.size!=null?p.size+" "+t("k_people"):""))+kv(t("k_when"),p.datetime)+kv(t("k_name"),p.name)+kv(t("k_tel"),p.tel)+kv(t("k_folio"),p.id);
+else if(kind==="viewing")rows=kv(t("k_property"),p.titulo_es||p.listing_id)+kv(t("k_zone"),p.zona)+kv(t("k_when"),p.datetime)+kv(t("k_name"),p.name)+kv(t("k_tel"),p.tel)+kv(t("k_folio"),p.id);
+else if(kind==="lead")rows=kv(t("k_name"),p.name)+kv(t("k_operation"),p.operacion)+kv(t("k_budget"),p.presupuesto_max?fmt(p.presupuesto_max):"—")+kv(t("k_zone"),p.zona||"—")+kv(t("k_quality"),(p.tier||"").toUpperCase());
+else rows=kv(t("k_reason"),p.reason)+kv(t("k_summary"),p.summary);
+const card=document.createElement("div");card.className="card"+(flash?" flash":"");card.style.borderLeftColor="#8a97a6";
+card.innerHTML=`<div class="chead"><span class="tid"><i class="fas ${icons[kind]||"fa-bell"}"></i> ${esc(p.id||"")}</span><span class="badge b-event">${t("t_"+kind)}</span><span class="when">${timeStr(Date.now())}</span></div><div class="cbody"><div class="kv">${rows}</div></div>`;
+return card;
+}
+function cardNode(type,p,flash){return type==="ticket"?ticketNode(p,flash):eventNode(type,p,flash);}
+function pushCard(type,p){ if(grid.querySelector(".empty"))grid.innerHTML=""; CARDS.unshift({type,payload:p}); grid.insertBefore(cardNode(type,p,true),grid.firstChild); $("gridcnt").textContent=CARDS.length; }
 
-  const EMIT_META={ticket:{icon:"fa-receipt",label:"emit_ticket"},reservation:{icon:"fa-calendar-check",label:"emit_reservation"},
-    viewing:{icon:"fa-house",label:"emit_viewing"},lead:{icon:"fa-user-check",label:"emit_lead"},handoff:{icon:"fa-headset",label:"emit_handoff"}};
+function renderAll(){
+stream.innerHTML=""; grid.innerHTML=""; thinkEl=null;
+if(!STREAM.length)stream.innerHTML=`<div class="empty"><div class="big"><i class="fas fa-robot"></i></div><div class="disp" style="font-size:16px">${t("empty_agent")}</div><div class="hint">${t("empty_hint")}</div></div>`;
+else{STREAM.forEach(e=>stream.appendChild(streamNode(e)));stream.scrollTop=stream.scrollHeight;}
+if(!CARDS.length)grid.innerHTML=`<div class="empty"><div class="big">${(cfg.branding&&cfg.branding.emoji)||"🍽️"}</div><div>${t("empty_board")}</div></div>`;
+else CARDS.forEach(c=>grid.appendChild(cardNode(c.type,c.payload,false)));
+$("streamcnt").textContent=STREAM.filter(x=>x.kind==="tool_call").length||""; $("gridcnt").textContent=CARDS.length||"";
+}
 
-  function onEvent(type,p,at){
-    if(FILTER_BIZ&&p&&p.business&&p.business!==FILTER_BIZ)return;
-    if(type==="agent_turn"){pushStream({kind:"agent_turn",payload:p,at},true);return;} // show 'thinking' after the customer msg
-    if(type==="agent_say"){pushStream({kind:"agent_say",payload:p,at});return;}
-    if(type==="tool_call"){toolcalls++;setStat("s-tools",toolcalls);pushStream({kind:"tool_call",payload:p,at},true);ding("tool");return;}
-    if(type==="session_reset"){pushStream({kind:"reset",payload:p,at});return;}
-    const m=EMIT_META[type]; if(m){const ref=type==="ticket"?(p.ticket_id||""):(p.id||"");pushStream({kind:"emit",payload:{icon:m.icon,label:t(m.label),ref,total:type==="ticket"?p.total:null},at});}
-    if(type==="ticket"){tickets++;sales+=Number(p.total||0);setStat("s-tickets",tickets);setStat("s-sales",sales);ding("ticket");pushCard("ticket",p);}
-    else if(type==="reservation"||type==="viewing"||type==="lead"||type==="handoff"){ding("event");pushCard(type,p);}
-  }
+const EMIT_META={ticket:{icon:"fa-receipt",label:"emit_ticket"},reservation:{icon:"fa-calendar-check",label:"emit_reservation"},
+viewing:{icon:"fa-house",label:"emit_viewing"},lead:{icon:"fa-user-check",label:"emit_lead"},handoff:{icon:"fa-headset",label:"emit_handoff"}};
 
-  function connect(){
-    const es=new EventSource("/events");
-    es.onopen=()=>{setConn("live");setTimeout(settleStats,1500);}; es.onerror=()=>setConn("reconnecting");
-    es.onmessage=(ev)=>{let e;try{e=JSON.parse(ev.data);}catch{return;}if(!e||!e.type)return;onEvent(e.type,e.payload||{},e.at);};
-  }
-  // ── interactive composer: drives the agent from the board ──
-  const SID = localStorage.getItem("demo_sid") || (()=>{const s="web-"+Math.random().toString(36).slice(2,9);localStorage.setItem("demo_sid",s);return s;})();
-  const PROMPTS={
-    restaurant:{es:["Quiero 3 tacos de pastor con todo y un agua de horchata","¿Qué me recomiendas para 2?","Una mesa para 4 el viernes 9pm"],
-                en:["I want 3 pastor tacos with everything and a horchata","What do you recommend for 2?","A table for 4 on Friday 9pm"]},
-    realestate:{es:["Busco renta en la Condesa, 2 recámaras, hasta 40 mil","¿Qué tienen en venta en Polanco?","Agéndame una visita el jueves 5pm"],
-                en:["Looking to rent in Condesa, 2 bedrooms, up to 40k","What's for sale in Polanco?","Book a viewing Thursday 5pm"]}
-  };
-  const msgInput=$("msg"), sendBtn=$("send"); let sending=false;
-  function renderComposer(){
-    if(!msgInput) return;
-    msgInput.placeholder=t("ph");
-    const pack=(cfg.tool_pack==="realestate")?"realestate":"restaurant";
-    const list=PROMPTS[pack][LANG]||PROMPTS[pack].es;
-    $("quick").innerHTML=`<span style="font-size:11px;color:var(--dim)">${t("try")}</span>`+list.map((p,i)=>`<span class="qchip" data-q="${i}">${esc(p)}</span>`).join("");
-    [...$("quick").querySelectorAll(".qchip")].forEach(c=>c.onclick=()=>send(list[+c.dataset.q]));
-  }
-  async function send(text){
-    text=(text!=null?text:msgInput.value).trim(); if(!text||sending)return;
-    sending=true; sendBtn.disabled=true; const old=msgInput.value; msgInput.value=""; msgInput.placeholder=t("sending");
-    try{ await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,business:cfg.slug,session:SID})}); }
-    catch(e){ msgInput.value=old; }
-    sending=false; sendBtn.disabled=false; msgInput.placeholder=t("ph"); msgInput.focus();
-  }
-  $("composer").addEventListener("submit",(e)=>{e.preventDefault();send();});
+function onEvent(type,p,at){
+if(FILTER_BIZ&&p&&p.business&&p.business!==FILTER_BIZ)return;
+if(type==="agent_turn"){pushStream({kind:"agent_turn",payload:p,at},true);return;} // show 'thinking' after the customer msg
+if(type==="agent_say"){pushStream({kind:"agent_say",payload:p,at});return;}
+if(type==="tool_call"){toolcalls++;setStat("s-tools",toolcalls);pushStream({kind:"tool_call",payload:p,at},true);ding("tool");return;}
+if(type==="session_reset"){pushStream({kind:"reset",payload:p,at});return;}
+const m=EMIT_META[type]; if(m){const ref=type==="ticket"?(p.ticket_id||""):(p.id||"");pushStream({kind:"emit",payload:{icon:m.icon,label:t(m.label),ref,total:type==="ticket"?p.total:null},at});}
+if(type==="ticket"){tickets++;sales+=Number(p.total||0);setStat("s-tickets",tickets);setStat("s-sales",sales);ding("ticket");pushCard("ticket",p);}
+else if(type==="reservation"||type==="viewing"||type==="lead"||type==="handoff"){ding("event");pushCard(type,p);}
+}
 
-  applyStatic(); setConn("connecting"); renderComposer(); renderAll(); connect(); setTimeout(settleStats,4000);
+function connect(){
+const es=new EventSource("/events");
+es.onopen=()=>{setConn("live");setTimeout(settleStats,1500);}; es.onerror=()=>setConn("reconnecting");
+es.onmessage=(ev)=>{let e;try{e=JSON.parse(ev.data);}catch{return;}if(!e||!e.type)return;onEvent(e.type,e.payload||{},e.at);};
+}
+// ── interactive composer: drives the agent from the board ──
+const SID = localStorage.getItem("demo_sid") || (()=>{const s="web-"+Math.random().toString(36).slice(2,9);localStorage.setItem("demo_sid",s);return s;})();
+const PROMPTS={
+restaurant:{es:["Quiero 3 tacos de pastor con todo y un agua de horchata","¿Qué me recomiendas para 2?","Una mesa para 4 el viernes 9pm"],
+en:["I want 3 pastor tacos with everything and a horchata","What do you recommend for 2?","A table for 4 on Friday 9pm"]},
+realestate:{es:["Busco renta en la Condesa, 2 recámaras, hasta 40 mil","¿Qué tienen en venta en Polanco?","Agéndame una visita el jueves 5pm"],
+en:["Looking to rent in Condesa, 2 bedrooms, up to 40k","What's for sale in Polanco?","Book a viewing Thursday 5pm"]}
+};
+const msgInput=$("msg"), sendBtn=$("send"); let sending=false;
+function renderComposer(){
+if(!msgInput) return;
+msgInput.placeholder=t("ph");
+const pack=(cfg.tool_pack==="realestate")?"realestate":"restaurant";
+const list=PROMPTS[pack][LANG]||PROMPTS[pack].es;
+$("quick").innerHTML=`<span style="font-size:11px;color:var(--dim)">${t("try")}</span>`+list.map((p,i)=>`<span class="qchip" data-q="${i}">${esc(p)}</span>`).join("");
+[...$("quick").querySelectorAll(".qchip")].forEach(c=>c.onclick=()=>send(list[+c.dataset.q]));
+}
+async function send(text){
+text=(text!=null?text:msgInput.value).trim(); if(!text||sending)return;
+sending=true; sendBtn.disabled=true; const old=msgInput.value; msgInput.value=""; msgInput.placeholder=t("sending");
+try{ await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text,business:cfg.slug,session:SID})}); }
+catch(e){ msgInput.value=old; }
+sending=false; sendBtn.disabled=false; msgInput.placeholder=t("ph"); msgInput.focus();
+}
+$("composer").addEventListener("submit",(e)=>{e.preventDefault();send();});
+
+applyStatic(); setConn("connecting"); renderComposer(); renderAll(); connect(); setTimeout(settleStats,4000);
 })();
 </script>
 </body>
