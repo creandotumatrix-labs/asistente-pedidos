@@ -12,79 +12,82 @@ const MAX_TOKENS = 1024;
 
 let client: Anthropic | null = null;
 function getClient(): Anthropic {
-  if (!client) {
-    if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY no está configurada.");
-    client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return client;
+if (!client) {
+if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY no está configurada.");
+client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+}
+return client;
 }
 
 export type Emit = (event: string, payload: Record<string, unknown>) => void;
 
 /**
- * Run one inbound user turn through the agent. Mutates session (history, order,
- * reservations) and returns the assistant text to send back over the channel.
- */
+* Run one inbound user turn through the agent. Mutates session (history, order,
+* reservations) and returns the assistant text to send back over the channel.
+*/
 export async function runAgent(session: Session, userText: string, emit: Emit): Promise<string[]> {
-  const config = loadConfig(session.businessSlug);
-  const pack = getToolPack(config.tool_pack);
-  const tools = toAnthropicTools(pack);
+const config = loadConfig(session.businessSlug);
+const pack = getToolPack(config.tool_pack);
+const tools = toAnthropicTools(pack);
 
-  // LIVE catalog from Postgres (no JSON at runtime): fetched once per turn and
-  // injected into the system prompt + every tool handler via ctx.
-  let menu: Menu | undefined;
-  let listings: Listing[] | undefined;
-  if (config.tool_pack === "restaurant") menu = await loadMenu(config);
-  else listings = await loadListings(config);
+// LIVE catalog from Postgres (no JSON at runtime): fetched once per turn and
+// injected into the system prompt + every tool handler via ctx.
+let menu: Menu | undefined;
+let listings: Listing[] | undefined;
+if (config.tool_pack === "restaurant") menu = await loadMenu(config);
+else listings = await loadListings(config);
 
-  const system = buildSystemPrompt(config, { menu, listings });
-  const ctx: ToolContext = { session, config, emit, now: () => new Date(), menu, listings };
-  const meta = { business: config.business_name, slug: config.slug, session: session.id };
+// Same instant used to ground "today" in the prompt (so "mañana"/"el viernes"
+// resolve to the real date) and to timestamp tool activity via ctx.now().
+const turnStartedAt = new Date();
+const system = buildSystemPrompt(config, { menu, listings }, turnStartedAt);
+const ctx: ToolContext = { session, config, emit, now: () => new Date(), menu, listings };
+const meta = { business: config.business_name, slug: config.slug, session: session.id };
 
-  // Stream the customer's turn to the live board (agentic activity feed).
-  emit("agent_turn", { ...meta, text: userText });
-  session.messages.push({ role: "user", content: userText });
-  const out: string[] = [];
+// Stream the customer's turn to the live board (agentic activity feed).
+emit("agent_turn", { ...meta, text: userText });
+session.messages.push({ role: "user", content: userText });
+const out: string[] = [];
 
-  for (let step = 0; step < MAX_STEPS; step++) {
-    const resp = await getClient().messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system,
-      messages: session.messages as Anthropic.MessageParam[],
-      tools: tools as Anthropic.Tool[],
-    });
+for (let step = 0; step < MAX_STEPS; step++) {
+const resp = await getClient().messages.create({
+model: MODEL,
+max_tokens: MAX_TOKENS,
+system,
+messages: session.messages as Anthropic.MessageParam[],
+tools: tools as Anthropic.Tool[],
+});
 
-    session.messages.push({ role: "assistant", content: resp.content });
+session.messages.push({ role: "assistant", content: resp.content });
 
-    for (const block of resp.content) {
-      if (block.type === "text" && block.text.trim()) {
-        out.push(block.text.trim());
-        emit("agent_say", { ...meta, text: block.text.trim() }); // agent reasoning/reply → board
-      }
-    }
+for (const block of resp.content) {
+if (block.type === "text" && block.text.trim()) {
+out.push(block.text.trim());
+emit("agent_say", { ...meta, text: block.text.trim() }); // agent reasoning/reply → board
+}
+}
 
-    const toolUses = resp.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
-    if (resp.stop_reason !== "tool_use" || toolUses.length === 0) break;
+const toolUses = resp.content.filter((b): b is Anthropic.ToolUseBlock => b.type === "tool_use");
+if (resp.stop_reason !== "tool_use" || toolUses.length === 0) break;
 
-    const results: Anthropic.ToolResultBlockParam[] = [];
-    for (const tu of toolUses) {
-      const def = findTool(pack, tu.name);
-      let result: unknown;
-      try {
-        result = def
-          ? def.handler((tu.input ?? {}) as Record<string, unknown>, ctx)
-          : { ok: false, error: "tool_desconocida", name: tu.name };
-      } catch (e) {
-        result = { ok: false, error: "excepcion", message: e instanceof Error ? e.message : String(e) };
-      }
-      const ok = !!(result && typeof result === "object" && (result as { ok?: unknown }).ok !== false);
-      emit("tool_call", { ...meta, tool: tu.name, input: (tu.input ?? {}) as Record<string, unknown>, ok }); // live tool call → board
-      results.push({ type: "tool_result", tool_use_id: tu.id, content: JSON.stringify(result) });
-    }
-    session.messages.push({ role: "user", content: results });
-  }
+const results: Anthropic.ToolResultBlockParam[] = [];
+for (const tu of toolUses) {
+const def = findTool(pack, tu.name);
+let result: unknown;
+try {
+result = def
+? def.handler((tu.input ?? {}) as Record<string, unknown>, ctx)
+: { ok: false, error: "tool_desconocida", name: tu.name };
+} catch (e) {
+result = { ok: false, error: "excepcion", message: e instanceof Error ? e.message : String(e) };
+}
+const ok = !!(result && typeof result === "object" && (result as { ok?: unknown }).ok !== false);
+emit("tool_call", { ...meta, tool: tu.name, input: (tu.input ?? {}) as Record<string, unknown>, ok }); // live tool call → board
+results.push({ type: "tool_result", tool_use_id: tu.id, content: JSON.stringify(result) });
+}
+session.messages.push({ role: "user", content: results });
+}
 
-  session.updatedAt = Date.now();
-  return out.length ? out : ["Perdón, ¿me lo repites? 🙏"];
+session.updatedAt = Date.now();
+return out.length ? out : ["Perdón, ¿me lo repites? 🙏"];
 }
