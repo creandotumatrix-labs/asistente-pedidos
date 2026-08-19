@@ -19,6 +19,16 @@ knowledge file). Swap the config → new business in minutes.
 
 ---
 
+## Demo
+
+![Demo en vivo — Asistente de Pedidos](asistente-pedidos-demo-v2.gif)
+
+- 🔴 **Demo en vivo (tablero de cocina):** [asistente-pedidos-production.up.railway.app/kitchen](https://asistente-pedidos-production.up.railway.app/kitchen)
+- 📄 **Detalles:** [asistente-pedidos-showcase.vercel.app](https://asistente-pedidos-showcase.vercel.app/)
+- ▶️ **Video:** [youtu.be/Idg40dF3FZE](https://youtu.be/Idg40dF3FZE)
+
+---
+
 ## TL;DR for tomorrow
 
 ```bash
