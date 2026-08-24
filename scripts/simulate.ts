@@ -4,7 +4,7 @@
 // The scripted demo invokes the REAL tool pack, so totals are truly computed and a
 // real structured ticket is emitted — your bulletproof fallback if the wifi dies.
 import readline from "node:readline";
-import { loadConfig } from "../src/config.ts";
+import { loadConfig, readMenuFixture } from "../src/config.ts";
 import { newSession } from "../src/session.ts";
 import { restaurantTools } from "../src/tools/restaurant.ts";
 import type { ToolContext, ToolDef } from "../src/types.ts";
@@ -41,7 +41,7 @@ function feedPrinter(type: string, payload: Record<string, unknown>) {
 function makeCtx(slug: string): ToolContext {
   const config = loadConfig(slug);
   const session = newSession("whatsapp:+5215555550000", slug, "Demo");
-  return { session, config, emit: feedPrinter, now: () => new Date() };
+  return { session, config, emit: feedPrinter, now: () => new Date(), menu: readMenuFixture(config) };
 }
 function call(pack: ToolDef[], name: string, input: Record<string, unknown>, ctx: ToolContext) {
   return pack.find((t) => t.name === name)!.handler(input, ctx);
