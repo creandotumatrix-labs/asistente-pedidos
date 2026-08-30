@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "White-label WhatsApp ordering + reservation agent on a shared Claude runtime. Flip one config line, same engine, new business.",
+  "license": "MIT",
   "engines": { "node": ">=22" },
   "scripts": {
     "dev": "tsx watch src/server.ts",
