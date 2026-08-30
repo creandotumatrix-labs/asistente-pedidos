@@ -1,21 +1,18 @@
-# 🌮 Asistente de Pedidos — WhatsApp ordering + reservations on a shared Claude runtime
+# 🌮 Asistente de Pedidos — Pedidos y Reservaciones por WhatsApp (es-MX)
 
-A WhatsApp agent that takes food orders in CDMX Spanish, upsells, computes the total
-**deterministically (tool-side, never LLM math)**, books tables, and emits a structured
-kitchen/POS ticket — then **flips one config line** to become a real-estate agent on the
-*exact same engine*. That flip is the pitch: one backend, white-labeled to any business.
+Un agente de WhatsApp que toma pedidos de comida en español de CDMX, hace upsell, calcula el total **determinísticamente (del lado de la herramienta, nunca con el LLM)**, reserva mesas, y emite un ticket estructurado de cocina/POS — y con **un solo cambio de config** se convierte en un agente inmobiliario sobre el **mismo motor exacto**. Ese cambio es la propuesta: un solo backend, white-label para cualquier negocio.
+
+*A WhatsApp agent that takes food orders in CDMX Spanish, upsells, computes the total deterministically (tool-side, never LLM math), books tables, and emits a structured kitchen/POS ticket — then flips one config line to become a real-estate agent on the exact same engine.*
 
 ```
-WhatsApp ──▶ webhook (Twilio | Meta) ──▶ shared Claude tool-use runtime ──▶ tools ──▶ structured event
-   ▲                                              │                          (ticket / reservation /
-   └──────────── reply (es-MX) ◀──────────────────┘                           viewing / lead)
+WhatsApp ──▶ webhook (Twilio | Meta) ──▶ shared Claude tool-use runtime ──▶ tools ──▶ evento estructurado
+   ▲                                              │                          (ticket / reservación /
+   └──────────── respuesta (es-MX) ◀──────────────┘                           visita / lead)
                                                                                      │
-                                              live ops board (SSE)  ◀────────────────┘
+                                          tablero de operación en vivo (SSE)  ◀──────┘
 ```
 
-The runtime, channel adapters, session, prompt assembly and event bus are **identical** for
-every business. A business is just a `configs/*.json` (persona + rules + which tool pack +
-knowledge file). Swap the config → new business in minutes.
+El runtime, los adaptadores de canal, la sesión, el ensamblado del prompt y el bus de eventos son **idénticos** para cada negocio. Un negocio es solo un `configs/*.json` (persona + reglas + qué paquete de herramientas + archivo de conocimiento). Cambia el config → nuevo negocio en minutos.
 
 ---
 
@@ -25,179 +22,146 @@ knowledge file). Swap the config → new business in minutes.
 
 - 🔴 **Demo en vivo (tablero de cocina):** [asistente-pedidos-production.up.railway.app/kitchen](https://asistente-pedidos-production.up.railway.app/kitchen)
 - 📄 **Detalles:** [asistente-pedidos-showcase.vercel.app](https://asistente-pedidos-showcase.vercel.app/)
-- ▶️ **Video:** [youtu.be/Idg40dF3FZE](https://youtu.be/Idg40dF3FZE)
+- 🎤 **Guión de pitch en vivo:** ver [DEMO.md](DEMO.md) — cue-card de escenario, minuto a minuto.
 
 ---
 
-## TL;DR for tomorrow
+## Quickstart
 
 ```bash
 npm install
-cp .env.example .env          # add ANTHROPIC_API_KEY (+ channel creds)
-npm run validate              # preflight: configs, menu, PRD math = $170
-npm test                      # 15 deterministic tests + 5 channel smoke checks
-npm run demo                  # offline scripted taquería flow (your safety net)
-npm start                     # boot webhook server + ops board on :8080
+cp .env.example .env          # agrega ANTHROPIC_API_KEY (+ credenciales de canal)
+npm run validate              # preflight: configs, menú, matemática del PRD = $170
+npm test                      # 15 tests determinísticos + 5 smoke checks de canal
+npm run demo                  # flujo de taquería offline con guión (tu respaldo sin internet)
+npm start                     # levanta el servidor webhook + tablero de operación en :8080
 ```
 
-Open the projector on **http://localhost:8080/kitchen**, message the WhatsApp number, watch
-the ticket land live.
-
-> **No internet on stage? You're still covered.** `npm run demo` runs the full taquería flow
-> with the **real tools** (real totals, real emitted ticket) and zero network. See
-> [Fallback](#fallback-if-the-wifi-dies).
+Abre el proyector en **http://localhost:8080/kitchen**, escríbele al número de WhatsApp, mira el ticket aparecer en vivo.
 
 ---
 
-## 5-minute deploy
+## Deploy en 5 minutos
 
-You need: Node ≥ 20, an `ANTHROPIC_API_KEY`, and a public HTTPS tunnel (`ngrok http 8080`).
-Pick **one** channel. Both provision a usable WhatsApp number instantly — no business
-verification required for the demo.
+Necesitas: Node ≥ 20, un `ANTHROPIC_API_KEY`, y un túnel HTTPS público (`ngrok http 8080`). Elige **un** canal — ambos aprovisionan un número de WhatsApp usable al instante, sin verificación de negocio para la demo.
 
-### Option A — Twilio WhatsApp Sandbox (fastest)
+### Opción A — Twilio WhatsApp Sandbox (la más rápida)
 
-1. `.env`: `CHANNEL=twilio`, `BUSINESS=taqueria-el-pastor`, `TWILIO_VALIDATE_SIGNATURE=false`
-   *(the sandbox replies via TwiML, so no outbound Twilio creds are needed to start).*
-2. `npm start`, then `ngrok http 8080` and copy the `https://…ngrok…` URL.
-3. **Twilio Console → Messaging → Try it out → WhatsApp sandbox settings.** Set
-   *"When a message comes in"* to `https://<ngrok>/webhook/twilio` (HTTP **POST**).
-4. From your phone, WhatsApp the sandbox number (`+1 415 523 8886`) the join code shown in
-   the console (e.g. `join silver-tiger`).
-5. Message it: *"buenas, quiero pedir"* → you're live.
+1. `.env`: `CHANNEL=twilio`, `BUSINESS=taqueria-el-pastor`, `TWILIO_VALIDATE_SIGNATURE=false` *(el sandbox responde vía TwiML, no se necesitan credenciales salientes de Twilio para arrancar)*.
+2. `npm start`, luego `ngrok http 8080` y copia la URL `https://…ngrok…`.
+3. **Twilio Console → Messaging → Try it out → WhatsApp sandbox settings.** En *"When a message comes in"* pon `https://<ngrok>/webhook/twilio` (HTTP **POST**).
+4. Desde tu teléfono, envía por WhatsApp al número sandbox (`+1 415 523 8886`) el código que muestra la consola (p.ej. `join silver-tiger`).
+5. Escríbele: *"buenas, quiero pedir"* → ya estás en vivo.
 
-*To enable signature validation: set `TWILIO_VALIDATE_SIGNATURE=true`, `TWILIO_AUTH_TOKEN=…`,
-and `PUBLIC_URL=https://<ngrok>`.*
+*Para activar validación de firma: `TWILIO_VALIDATE_SIGNATURE=true`, `TWILIO_AUTH_TOKEN=…`, `PUBLIC_URL=https://<ngrok>`.*
 
-### Option B — Meta WhatsApp Cloud API (free test number)
+### Opción B — Meta WhatsApp Cloud API (número de prueba gratis)
 
-1. **developers.facebook.com** → create app (type *Business*) → add **WhatsApp**. Copy the
-   **test number's** `phone_number_id`, a temporary **access token**, and add your personal
-   number as an allowed recipient (test mode allows up to 5).
-2. `.env`: `CHANNEL=meta`, `META_PHONE_NUMBER_ID=…`, `META_ACCESS_TOKEN=…`,
-   `META_VERIFY_TOKEN=<any-string>`, `META_GRAPH_VERSION=v22.0`.
+1. **developers.facebook.com** → crear app (tipo *Business*) → agregar **WhatsApp**. Copia el `phone_number_id` del **número de prueba**, un **access token** temporal, y agrega tu número personal como destinatario permitido (modo de prueba permite hasta 5).
+2. `.env`: `CHANNEL=meta`, `META_PHONE_NUMBER_ID=…`, `META_ACCESS_TOKEN=…`, `META_VERIFY_TOKEN=<cualquier-string>`, `META_GRAPH_VERSION=v22.0`.
 3. `npm start` + `ngrok http 8080`.
-4. In the WhatsApp product → **Configuration → Webhook**, set callback URL
-   `https://<ngrok>/webhook/meta` and the verify token to your `META_VERIFY_TOKEN`; **subscribe
-   to `messages`**.
-5. Message the test number from your allowed phone.
+4. En el producto WhatsApp → **Configuration → Webhook**, pon la URL de callback `https://<ngrok>/webhook/meta` y el verify token igual a tu `META_VERIFY_TOKEN`; **suscríbete a `messages`**.
+5. Escríbele al número de prueba desde tu teléfono permitido.
 
-> **Production note (post-demo):** a *branded* production number requires Meta Business
-> verification (days, not hours) on either channel. The sandbox/test number above is the right
-> tool for a live pitch; productionizing the number is a separate step.
+> **Nota de producción (post-demo):** un número de producción *con marca* requiere verificación de negocio de Meta (días, no horas) en cualquiera de los dos canales. El número sandbox/prueba de arriba es la herramienta correcta para un pitch en vivo; llevar el número a producción es un paso aparte.
 
 ---
 
-## The demo (see `DEMO.md` for the stage cue-card)
+## Por qué esta arquitectura vende
 
-**Act 1 — Order tacos on WhatsApp.** Type, in order:
+- **Dinero determinístico.** Totales, promos (guac $55→$45), modificadores pagados (+$12 queso) y items 86'd se calculan en `src/tools/restaurant.ts` — el modelo *nunca* hace aritmética. Probado por `npm test` (el pedido del PRD se verifica en exactamente `$170`).
+- **Grounded.** El agente solo vende items reales y disponibles del menú a precios reales; el menú se inyecta en el system prompt y se hace cumplir en las herramientas.
+- **Un motor, muchos negocios.** `taqueria-el-pastor`, `la-mesa-fina` (persona fine-dining), `inmobiliaria-cdmx` (inmobiliaria) corren todos el mismo `src/agent.ts`.
+- **Salida estructurada.** `emit_ticket` produce un contrato JSON listo para POS (`schemas/ticket.schema.json`) que cualquier pantalla de cocina o POS puede consumir.
 
-```
-buenas, quiero pedir para llevar
-3 tacos de pastor y un agua de horchata
-sí, con todo
-va                       ← accepts the guacamole upsell
-para llevar, 2pm
-```
-
-The agent confirms the order, lands the **$170** total, and a structured ticket **pops onto
-the kitchen board** with a ding. Then show the 86 guardrail:
-
-```
-¿tienen quesabirria?     ← it's sold out (disponible:false) → agent won't sell it
-```
-
-**Act 2 — The flip.** Stop the server, change one line in `.env`:
-
-```
-BUSINESS=inmobiliaria-cdmx
-```
-
-`npm start`, reload the board. **Same number, same engine** — now it's a real-estate concierge:
-
-```
-hola, busco depa en renta en la Condesa
-2 recámaras, hasta 40 mil
-agéndame una visita el jueves a las 5pm
-```
-
-A **viewing** card appears on the same board. The line that wins the room:
-*"Same backend. We flipped one config file. That's the white-label model — your taquería
-customer and your real-estate customer run on one system we maintain once."*
+*Deterministic totals computed tool-side, grounded to a real menu, one engine serving multiple businesses via config, structured JSON output any POS can consume.*
 
 ---
 
-## Why this architecture sells
-
-- **Deterministic money.** Totals, promos (guac $55→$45), paid modifiers (+$12 queso) and
-  86'd items are computed in `src/tools/restaurant.ts` — the model *never* does arithmetic.
-  Proven by `npm test` (the PRD order is asserted at exactly `$170`).
-- **Grounded.** The agent only sells real, available menu items at real prices; the menu is
-  injected into the system prompt and enforced by the tools.
-- **One engine, many businesses.** `taqueria-el-pastor`, `la-mesa-fina` (fine-dining persona),
-  `inmobiliaria-cdmx` (real estate) all run the same `src/agent.ts`.
-- **Structured output.** `emit_ticket` produces a POS-ready JSON contract
-  (`schemas/ticket.schema.json`) any kitchen display or POS can consume.
-
----
-
-## Project layout
+## Estructura del proyecto
 
 ```
-configs/                  the white-label surface — one JSON per business
-  taqueria-el-pastor.json  · restaurant: ordering, upsell, reservations, ticket
-  la-mesa-fina.json        · restaurant tools, fine-dining persona (shows tone range)
-  inmobiliaria-cdmx.json   · real-estate tools (the flip)
-data/                     knowledge files referenced by configs
-  menu.taqueria.json       · 22-item CDMX menu, promos + 2 items 86'd
-  menu.finedining.json     · small upscale menu
-  listings.cdmx.json       · 8 CDMX properties (renta/venta)
-schemas/ticket.schema.json structured kitchen/POS ticket contract (JSON Schema)
+configs/                  la superficie white-label — un JSON por negocio
+  taqueria-el-pastor.json  · restaurante: pedidos, upsell, reservaciones, ticket
+  la-mesa-fina.json        · herramientas de restaurante, persona fine-dining
+  inmobiliaria-cdmx.json   · herramientas inmobiliarias (el flip)
+data/                     archivos de conocimiento referenciados por los configs
+  menu.taqueria.json       · menú CDMX de 22 items, promos + 2 items 86'd
+  menu.finedining.json     · menú pequeño y elevado
+  listings.cdmx.json       · 8 propiedades CDMX (renta/venta)
+schemas/ticket.schema.json contrato estructurado de ticket cocina/POS (JSON Schema)
 src/
-  agent.ts                 the shared Claude tool-use loop (only SDK importer)
-  prompt.ts                builds persona + rules + grounded knowledge from config
+  agent.ts                 el loop de tool-use de Claude compartido (único importador del SDK)
+  prompt.ts                arma persona + reglas + conocimiento grounded desde el config
   tools/restaurant.ts      get_menu, add_to_order, create_order, emit_ticket, book_table, handoff_human
   tools/realestate.ts      get_listings, schedule_viewing, qualify_lead, handoff_human
-  channels/twilio.ts       inbound parse + HMAC-SHA1 signature + TwiML reply (zero-dep)
-  channels/meta.ts         inbound parse + verify handshake + Graph send (zero-dep)
-  server.ts                webhook routes + SSE ops feed + board
+  channels/twilio.ts       parseo inbound + firma HMAC-SHA1 + respuesta TwiML (sin dependencias)
+  channels/meta.ts         parseo inbound + verify handshake + envío por Graph (sin dependencias)
+  server.ts                rutas webhook + feed SSE de operación + tablero
   config.ts session.ts bus.ts types.ts
-web/kitchen.html           the live ops board (SSE, animated, plays a ding)
-scripts/                   simulate (REPL + offline demo), test, validate, check-channels
+web/kitchen.html           el tablero de operación en vivo (SSE, animado, suena)
+scripts/                   simulate (REPL + demo offline), test, validate, check-channels
 ```
 
-## Commands
+## Comandos
 
-| command | what it does |
+| comando | qué hace |
 |---|---|
-| `npm run validate` | preflight every config/menu/listing; verifies the PRD math |
-| `npm test` | 15 deterministic domain tests + 5 channel smoke checks (no network) |
-| `npm run demo` | offline scripted taquería flow with real tools — **stage fallback** |
-| `npm run simulate` | live REPL against the real model (`ANTHROPIC_API_KEY` required) |
-| `npm run simulate -- --business=inmobiliaria-cdmx` | REPL as the real-estate agent |
-| `npm start` | boot the webhook server + ops board |
-| `npm run typecheck` | `tsc --noEmit` (needs `npm install` for `@types`) |
+| `npm run validate` | preflight de cada config/menú/listing; verifica la matemática del PRD |
+| `npm test` | 15 tests determinísticos de dominio + 5 smoke checks de canal (sin red) |
+| `npm run demo` | flujo de taquería offline con guión, con herramientas reales — **respaldo de escenario** |
+| `npm run simulate` | REPL en vivo contra el modelo real (requiere `ANTHROPIC_API_KEY`) |
+| `npm run simulate -- --business=inmobiliaria-cdmx` | REPL como el agente inmobiliario |
+| `npm start` | levanta el servidor webhook + tablero de operación |
+| `npm run typecheck` | `tsc --noEmit` (necesita `npm install` para `@types`) |
 
-## Model & cost
+## Modelo y costo
 
-Default `MODEL=claude-sonnet-4-6` — the latency/quality sweet spot for a snappy WhatsApp
-agent. Drop to `claude-haiku-4-5-20251001` for lower cost/latency, or `claude-opus-4-8` for the
-hardest reasoning. Each turn is short (`max_tokens: 1024`) and the menu is injected once, so
-per-order cost is low.
+`MODEL=claude-sonnet-4-6` por default — el punto dulce de latencia/calidad para un agente de WhatsApp ágil. Baja a `claude-haiku-4-5-20251001` para menor costo/latencia, o `claude-opus-4-8` para el razonamiento más difícil. Cada turno es corto (`max_tokens: 1024`) y el menú se inyecta una sola vez, así que el costo por pedido es bajo.
 
-## Guardrails (enforced in tools + prompt)
+## Guardrails (en herramientas + prompt)
 
-Sells only real, **available** items at real prices · totals computed tool-side · confirms full
-order + total before `create_order` · allergen/medical questions answered from menu data or
-handed off (no medical advice) · out-of-hours orders scheduled · `handoff_human` for anything
-out of scope.
+Solo vende items reales y **disponibles** a precios reales · totales calculados del lado de la herramienta · confirma pedido completo + total antes de `create_order` · preguntas de alérgenos/médicas se responden desde los datos del menú o se escalan (sin consejo médico) · pedidos fuera de horario se agendan · `handoff_human` para lo que quede fuera de alcance.
 
-## Notes
+## Notas
 
-- Runs on **TypeScript via Node's native type-stripping** — `tsx` is only used for the dev
-  server convenience; the test/validate/demo scripts run on stock `node`.
-- Session state is in-memory (one `Map`) for the demo. Swap `SessionStore` for Redis/Postgres
-  in production — single interface, single file.
-- `scripts/_chk.ts` is a deprecated alias of `scripts/check-channels.ts`; safe to delete.
-- Out of scope (phase 2, per PRD): live POS integration, payment links, delivery dispatch,
-  inventory-driven 86'ing, loyalty.
+- Corre en **TypeScript vía type-stripping nativo de Node** — `tsx` solo se usa por conveniencia del server de desarrollo; los scripts de test/validate/demo corren en `node` estándar.
+- El estado de sesión está en memoria (un `Map`) para la demo. Cambia `SessionStore` por Redis/Postgres en producción — una sola interfaz, un solo archivo.
+- `scripts/_chk.ts` es un alias obsoleto de `scripts/check-channels.ts`; seguro de borrar.
+- Fuera de alcance (fase 2, según el PRD): integración POS en vivo, links de pago, dispatch de entrega, 86'd por inventario, lealtad.
+
+---
+
+## Preguntas frecuentes / FAQ
+
+**¿Funciona con mi número de WhatsApp actual?** — Sí, vía WhatsApp Cloud API (Meta) o Twilio. Un número de producción con marca necesita verificación de negocio de Meta (días, no horas); el sandbox/número de prueba funciona al instante para una demo.
+*Yes, via WhatsApp Cloud API or Twilio — a branded production number needs Meta business verification; the sandbox/test number works instantly for a demo.*
+
+**¿Cuánto cuesta?** — Depende del negocio (menú/catálogo, canal, integraciones). Escríbenos vía [creandotumatrix.com](https://creandotumatrix.com) para una cotización.
+*Depends on the business — contact us via creandotumatrix.com for a quote.*
+
+**¿Puedo usarlo para otro negocio que no sea restaurante?** — Sí — ese es el punto. `inmobiliaria-cdmx` corre sobre el mismo motor solo cambiando el config; cualquier vertical con un catálogo/inventario + flujo de agendado aplica.
+*Yes — that's the point. The real-estate config runs on the same engine with no code changes.*
+
+**¿El total del pedido lo calcula el modelo?** — No, nunca. Todo el cálculo de dinero vive en `src/tools/restaurant.ts`; `npm test` verifica el pedido del PRD en exactamente $170.
+*No — all money math lives in the tool layer, never the model.*
+
+---
+
+## Asistentes CTM — la familia / the family
+
+Los tres agentes de WhatsApp de **Creando Tu Matrix**, todos sobre el mismo patrón: runtime de tool-use con Claude, guardrails determinísticos en código, y una superficie de configuración white-label por negocio.
+
+| Agente | Qué hace | Repo |
+|---|---|---|
+| 🌮 **asistente-pedidos** | Pedidos y reservaciones por WhatsApp para restaurantes | [creandotumatrix-labs/asistente-pedidos](https://github.com/creandotumatrix-labs/asistente-pedidos) |
+| 🛍️ **asistente-de-tienda** | Soporte y ventas de retail/ecommerce, sobre catálogo real | [creandotumatrix-labs/asistente-de-tienda](https://github.com/creandotumatrix-labs/asistente-de-tienda) |
+| 📈 **asistente-comercial** | Calificación y agendado de leads, agnóstico al vertical | [creandotumatrix-labs/asistente-comercial](https://github.com/creandotumatrix-labs/asistente-comercial) |
+
+*The three Creando Tu Matrix WhatsApp agents, all on the same pattern: a Claude tool-use runtime, deterministic guardrails in code, and a per-business white-label config surface.*
+
+🌐 Más sobre CTM: [creandotumatrix.com](https://creandotumatrix.com) · Org: [creandotumatrix-labs](https://github.com/creandotumatrix-labs)
+
+---
+
+Construido por [Marcus Patman](https://github.com/marcuspat) — Principal Agentic Engineer · Parte de **Asistentes CTM** en [creandotumatrix-labs](https://github.com/creandotumatrix-labs)
