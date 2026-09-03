@@ -4,7 +4,7 @@
 > built in the prior session, so a forked session can continue without re-deriving anything.
 > Last updated: 2026-06-29.
 >
-> **Repo:** https://github.com/adventurewave-labs/asistente-pedidos (private). The build
+> **Repo:** https://github.com/creandotumatrix-labs/asistente-pedidos (private). The build
 > sandbox can't reach GitHub, so the push runs from the Cowork outputs folder on the Mac.
 
 ## What this is
