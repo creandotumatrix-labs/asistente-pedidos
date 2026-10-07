@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.svg" alt="asistente-pedidos — animated banner" width="100%"></p>
+
 # 🌮 Asistente de Pedidos — Pedidos y Reservaciones por WhatsApp (es-MX)
 
 Un agente de WhatsApp que toma pedidos de comida en español de CDMX, hace upsell, calcula el total **determinísticamente (del lado de la herramienta, nunca con el LLM)**, reserva mesas, y emite un ticket estructurado de cocina/POS — y con **un solo cambio de config** se convierte en un agente inmobiliario sobre el **mismo motor exacto**. Ese cambio es la propuesta: un solo backend, white-label para cualquier negocio.
