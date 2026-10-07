@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-label="asistente-pedidos — asistente-pedidos">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-label="asistente-pedidos: Agente de pedidos y reservas por WhatsApp para restaurantes (es-MX).">
 <title>asistente-pedidos</title>
 <defs>
 <radialGradient id="aur1"><stop offset="0" stop-color="#10b981" stop-opacity="0.50"/><stop offset="1" stop-color="#10b981" stop-opacity="0"/></radialGradient>
@@ -87,9 +87,9 @@
 <animate attributeName="y" values="58;-8;-8" keyTimes="0;0.5;1" dur="5s" repeatCount="indefinite"/>
 </rect>
 <g stroke="#57503f" stroke-width="3" stroke-linecap="round">
-<line x1="-62" y1="8" x2="62" y2="8"><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.5;0.55;0.95" dur="5s" repeatCount="indefinite"/></line>
-<line x1="-62" y1="22" x2="40" y2="22"><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.55;0.6;0.95" dur="5s" repeatCount="indefinite"/></line>
-<line x1="-62" y1="36" x2="50" y2="36"><animate attributeName="opacity" values="0;0;1;0" keyTimes="0;0.6;0.65;0.95" dur="5s" repeatCount="indefinite"/></line>
+<line x1="-62" y1="8" x2="62" y2="8"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.5;0.55;0.95;1" dur="5s" repeatCount="indefinite"/></line>
+<line x1="-62" y1="22" x2="40" y2="22"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.55;0.6;0.95;1" dur="5s" repeatCount="indefinite"/></line>
+<line x1="-62" y1="36" x2="50" y2="36"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.6;0.65;0.95;1" dur="5s" repeatCount="indefinite"/></line>
 </g>
 <text x="0" y="64" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="12" fill="#fbbf24" text-anchor="middle">→ COCINA
 <animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/></text>
