@@ -1,0 +1,10 @@
+# asistente-pedidos
+
+> Agente de pedidos y reservas por WhatsApp para restaurantes (es-MX). Totales determinísticos, ticket a cocina en vivo. Twilio + Meta Cloud API.
+
+asistente-pedidos is maintained by Creando Tu Matrix Labs (Agentes de IA para LATAM · en español).
+
+## Links
+
+- [Landing page](https://creandotumatrix-labs.github.io/asistente-pedidos/): overview, features, FAQ
+- [Source code](https://github.com/creandotumatrix-labs/asistente-pedidos): README, issues, releases
